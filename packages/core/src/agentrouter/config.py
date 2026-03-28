@@ -26,3 +26,10 @@ class Settings(BaseSettings):
 
     # Health check interval in seconds
     health_check_interval: int = 30
+
+    # Routing
+    routing_enabled: bool = True
+    routing_allowed_providers: str = ""  # Comma-separated, empty = all allowed
+    routing_denied_providers: str = ""  # Comma-separated
+    routing_tier_floor: str = ""  # Minimum tier: "economy", "standard", "premium"
+    routing_tier_ceiling: str = ""  # Maximum tier (overrides model ceiling if lower)

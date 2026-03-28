@@ -18,6 +18,8 @@ from agentrouter.models.openai import (
     ChatCompletionResponse,
 )
 from agentrouter.providers.base import LLMProvider
+from agentrouter.routing.engine import RoutingEngine
+from agentrouter.routing.models import RoutingDecision, Tier
 from agentrouter.services.provider_registry import ProviderRegistry
 from agentrouter.services.request_log import RequestLogService
 
@@ -66,6 +68,44 @@ class ProxyService:
             provider_api_keys=keys,
         )
 
+    def _maybe_route(
+        self, request: ChatCompletionRequest, registry: ProviderRegistry
+    ) -> RoutingDecision | None:
+        """Run the routing engine if enabled. Returns None if routing is off."""
+        if not self._settings.routing_enabled:
+            return None
+
+        # Parse operator config
+        allowed = (
+            set(self._settings.routing_allowed_providers.split(","))
+            if self._settings.routing_allowed_providers
+            else None
+        )
+        denied = (
+            set(self._settings.routing_denied_providers.split(","))
+            if self._settings.routing_denied_providers
+            else None
+        )
+        floor = (
+            Tier(self._settings.routing_tier_floor)
+            if self._settings.routing_tier_floor
+            else None
+        )
+        ceiling = (
+            Tier(self._settings.routing_tier_ceiling)
+            if self._settings.routing_tier_ceiling
+            else None
+        )
+
+        engine = RoutingEngine(
+            available_providers=set(registry.available_providers),
+            allowed_providers=allowed,
+            denied_providers=denied,
+            tier_floor=floor,
+            tier_ceiling=ceiling,
+        )
+        return engine.route(request)
+
     def _get_provider_and_model(
         self, registry: ProviderRegistry, model: str
     ) -> tuple[LLMProvider, str] | None:
@@ -84,8 +124,14 @@ class ProxyService:
         registry = self._build_registry(auth)
         start = time.monotonic()
 
+        # Route to a cheaper model if possible
+        routing_decision = self._maybe_route(request, registry)
+        effective_model = (
+            routing_decision.routed_model if routing_decision else request.model
+        )
+
         # Build list of (provider, model) to try
-        attempts = self._build_attempt_list(registry, request.model)
+        attempts = self._build_attempt_list(registry, effective_model)
 
         last_error: Exception | None = None
         for provider, model_name in attempts:
@@ -168,7 +214,14 @@ class ProxyService:
         """Proxy a streaming request. Failover only before first byte."""
         registry = self._build_registry(auth)
         start = time.monotonic()
-        attempts = self._build_attempt_list(registry, request.model)
+
+        # Route to a cheaper model if possible
+        routing_decision = self._maybe_route(request, registry)
+        effective_model = (
+            routing_decision.routed_model if routing_decision else request.model
+        )
+
+        attempts = self._build_attempt_list(registry, effective_model)
 
         last_error: Exception | None = None
         for provider, model_name in attempts:
