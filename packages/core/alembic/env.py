@@ -7,7 +7,7 @@ from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from agentrouter.models.db import Base
+from kestrel.models.db import Base
 
 config = context.config
 

@@ -4,7 +4,7 @@ install:
 	cd packages/core && uv sync
 
 dev:
-	cd packages/core && uv run uvicorn agentrouter.app:create_app --factory --reload --port 8080
+	cd packages/core && uv run uvicorn kestrel.app:create_app --factory --reload --port 8080
 
 lint:
 	cd packages/core && uv run ruff check src/ tests/ && uv run ruff format --check src/ tests/
@@ -16,7 +16,7 @@ typecheck:
 	cd packages/core && uv run mypy src/
 
 test:
-	cd packages/core && uv run pytest -v --cov=agentrouter --cov-report=term-missing
+	cd packages/core && uv run pytest -v --cov=kestrel --cov-report=term-missing
 
 migrate:
 	cd packages/core && uv run alembic upgrade head

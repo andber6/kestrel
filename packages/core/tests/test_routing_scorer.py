@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from agentrouter.routing.models import RequestFeatures
-from agentrouter.routing.scorer import RuleBasedScorer
+from kestrel.routing.models import RequestFeatures
+from kestrel.routing.scorer import RuleBasedScorer
 
 
 def _scorer() -> RuleBasedScorer:

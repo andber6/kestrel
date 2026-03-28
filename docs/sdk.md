@@ -1,22 +1,22 @@
 # Python SDK
 
-The AgentRouter Python SDK is a thin wrapper over the [OpenAI Python SDK](https://github.com/openai/openai-python). It configures the client to route through AgentRouter — all `openai.OpenAI` methods work as expected.
+The Kestrel Python SDK is a thin wrapper over the [OpenAI Python SDK](https://github.com/openai/openai-python). It configures the client to route through Kestrel — all `openai.OpenAI` methods work as expected.
 
 ## Installation
 
 ```bash
-pip install agentrouter
+pip install kestrel
 ```
 
 ## Basic Usage
 
 ```python
-import agentrouter
+import kestrel
 
-client = agentrouter.Client(
-    api_key="ar-your-agentrouter-key",      # AgentRouter API key
+client = kestrel.Client(
+    api_key="ks-your-kestrel-key",      # Kestrel API key
     provider_key="sk-your-openai-key",       # LLM provider API key
-    base_url="http://localhost:8080/v1",     # AgentRouter proxy URL
+    base_url="http://localhost:8080/v1",     # Kestrel proxy URL
 )
 
 response = client.chat.completions.create(
@@ -29,10 +29,10 @@ print(response.choices[0].message.content)
 ## Async Usage
 
 ```python
-import agentrouter
+import kestrel
 
-client = agentrouter.AsyncClient(
-    api_key="ar-your-key",
+client = kestrel.AsyncClient(
+    api_key="ks-your-key",
     provider_key="sk-your-openai-key",
 )
 
@@ -44,16 +44,16 @@ response = await client.chat.completions.create(
 
 ## Pass-Through Mode
 
-If you don't have an AgentRouter API key yet, pass the provider key directly:
+If you don't have an Kestrel API key yet, pass the provider key directly:
 
 ```python
-client = agentrouter.Client(
+client = kestrel.Client(
     api_key="sk-your-openai-key",           # Provider key directly
     base_url="http://localhost:8080/v1",
 )
 ```
 
-In dev mode (`AR_DEV_MODE=true`), this sends the provider key in the Authorization header and bypasses AgentRouter authentication.
+In dev mode (`KS_DEV_MODE=true`), this sends the provider key in the Authorization header and bypasses Kestrel authentication.
 
 ## Streaming
 
@@ -105,7 +105,7 @@ llm = ChatOpenAI(
 
 ## API Reference
 
-### `agentrouter.Client`
+### `kestrel.Client`
 
 Subclass of `openai.OpenAI`. All OpenAI client methods are available.
 
@@ -113,11 +113,11 @@ Subclass of `openai.OpenAI`. All OpenAI client methods are available.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `api_key` | `str` | AgentRouter key (`ar-...`) or provider key (`sk-...`) |
-| `provider_key` | `str` | LLM provider API key (required with AR key) |
-| `base_url` | `str` | AgentRouter URL (default: `http://localhost:8080/v1`) |
+| `api_key` | `str` | Kestrel key (`ks-...`) or provider key (`sk-...`) |
+| `provider_key` | `str` | LLM provider API key (required with Kestrel key) |
+| `base_url` | `str` | Kestrel URL (default: `http://localhost:8080/v1`) |
 | `**kwargs` | | Passed to `openai.OpenAI` |
 
-### `agentrouter.AsyncClient`
+### `kestrel.AsyncClient`
 
 Async version. Subclass of `openai.AsyncOpenAI`. Same parameters as `Client`.

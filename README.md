@@ -1,12 +1,12 @@
-# AgentRouter
+# Kestrel
 
 **Drop-in LLM API proxy that routes requests to the cheapest capable model.**
 
-AgentRouter sits between your AI agent and LLM providers. It intercepts every outgoing API request, classifies the complexity of the prompt, and automatically routes it to the cheapest model that can handle it. You change one line of code — your base URL — and start saving 50-80% on LLM API costs. The response format is identical. Streaming works. Function calling works. Your agent doesn't know routing happened.
+Kestrel sits between your AI agent and LLM providers. It intercepts every outgoing API request, classifies the complexity of the prompt, and automatically routes it to the cheapest model that can handle it. You change one line of code — your base URL — and start saving 50-80% on LLM API costs. The response format is identical. Streaming works. Function calling works. Your agent doesn't know routing happened.
 
 ## How It Works
 
-1. **Receive** — Your agent sends a request to AgentRouter instead of directly to OpenAI/Anthropic/etc.
+1. **Receive** — Your agent sends a request to Kestrel instead of directly to OpenAI/Anthropic/etc.
 2. **Analyze** — Extract structural features: prompt length, tool presence, domain keywords, code blocks, conversation depth
 3. **Score** — Rate complexity across 5 dimensions (reasoning depth, output complexity, domain specificity, instruction nuance, error tolerance)
 4. **Route** — Map the score to a tier (Economy/Standard/Premium) and pick the cheapest model that fits, never exceeding the model you specified
@@ -17,8 +17,8 @@ AgentRouter sits between your AI agent and LLM providers. It intercepts every ou
 ### Docker (recommended)
 
 ```bash
-git clone https://github.com/agentrouter/agentrouter.git
-cd agentrouter
+git clone https://github.com/usekestrel/kestrel.git
+cd kestrel
 cp .env.example .env
 # Edit .env — add at least one provider API key
 docker compose up
@@ -45,26 +45,26 @@ cd packages/core
 uv sync --all-extras
 cp ../../.env.example ../../.env
 # Edit .env
-AR_DEV_MODE=true AR_DEV_OPENAI_API_KEY=sk-... uv run uvicorn agentrouter.app:create_app --factory --reload --port 8080
+KS_DEV_MODE=true KS_DEV_OPENAI_API_KEY=sk-... uv run uvicorn kestrel.app:create_app --factory --reload --port 8080
 ```
 
 ### Python SDK
 
 ```bash
-pip install agentrouter
+pip install kestrel
 ```
 
 ```python
-import agentrouter
+import kestrel
 
-client = agentrouter.Client(
-    api_key="ar-your-agentrouter-key",
+client = kestrel.Client(
+    api_key="ks-your-kestrel-key",
     provider_key="sk-your-openai-key",
     base_url="http://localhost:8080/v1",
 )
 
 response = client.chat.completions.create(
-    model="gpt-4o",  # ceiling — AgentRouter may route to a cheaper model
+    model="gpt-4o",  # ceiling — Kestrel may route to a cheaper model
     messages=[{"role": "user", "content": "What is 2+2?"}],
 )
 print(response.choices[0].message.content)
@@ -79,7 +79,7 @@ print(response.choices[0].message.content)
 | **Google Gemini** | gemini-1.5-pro, gemini-1.5-flash, gemini-2.0-* | Full translation (generateContent API) |
 | **Groq** | llama-3.1-8b/70b, mixtral, gemma | OpenAI-compatible (minor field stripping) |
 
-All providers expose the same OpenAI-compatible API. Send any supported model name and AgentRouter auto-detects the provider and handles format translation.
+All providers expose the same OpenAI-compatible API. Send any supported model name and Kestrel auto-detects the provider and handles format translation.
 
 ## Routing
 
@@ -109,23 +109,23 @@ Copy `.env.example` to `.env` and configure:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `AR_DEV_MODE` | `false` | Bypass auth, use dev API keys |
-| `AR_ROUTING_ENABLED` | `true` | Enable/disable automatic routing |
-| `AR_DEV_OPENAI_API_KEY` | — | OpenAI API key (dev mode) |
-| `AR_DEV_ANTHROPIC_API_KEY` | — | Anthropic API key (dev mode) |
-| `AR_DEV_GEMINI_API_KEY` | — | Gemini API key (dev mode) |
-| `AR_DEV_GROQ_API_KEY` | — | Groq API key (dev mode) |
-| `AR_ROUTING_TIER_FLOOR` | — | Minimum tier (`economy`, `standard`, `premium`) |
-| `AR_ROUTING_TIER_CEILING` | — | Maximum tier |
+| `KS_DEV_MODE` | `false` | Bypass auth, use dev API keys |
+| `KS_ROUTING_ENABLED` | `true` | Enable/disable automatic routing |
+| `KS_DEV_OPENAI_API_KEY` | — | OpenAI API key (dev mode) |
+| `KS_DEV_ANTHROPIC_API_KEY` | — | Anthropic API key (dev mode) |
+| `KS_DEV_GEMINI_API_KEY` | — | Gemini API key (dev mode) |
+| `KS_DEV_GROQ_API_KEY` | — | Groq API key (dev mode) |
+| `KS_ROUTING_TIER_FLOOR` | — | Minimum tier (`economy`, `standard`, `premium`) |
+| `KS_ROUTING_TIER_CEILING` | — | Maximum tier |
 
 See `.env.example` for the full list.
 
 ## Architecture
 
 ```
-packages/core/src/agentrouter/
+packages/core/src/kestrel/
   app.py                 # FastAPI application factory
-  config.py              # Settings (AR_ env vars)
+  config.py              # Settings (KS_ env vars)
   providers/             # LLM provider adapters
     openai.py            #   OpenAI (native pass-through)
     anthropic.py         #   Anthropic (full format translation)

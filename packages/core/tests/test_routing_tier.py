@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from agentrouter.routing.model_selector import select_model
-from agentrouter.routing.models import RoutingScores, Tier
-from agentrouter.routing.tier_resolver import (
+from kestrel.routing.model_selector import select_model
+from kestrel.routing.models import RoutingScores, Tier
+from kestrel.routing.tier_resolver import (
     get_model_tier,
     resolve_tier,
     score_to_tier,

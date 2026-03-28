@@ -1,4 +1,4 @@
-"""Shared test fixtures for AgentRouter."""
+"""Shared test fixtures for Kestrel."""
 
 from __future__ import annotations
 
@@ -8,15 +8,15 @@ from unittest.mock import AsyncMock, MagicMock
 import httpx
 import pytest
 
-from agentrouter.app import create_app
-from agentrouter.config import Settings
-from agentrouter.services.proxy import ProxyService
+from kestrel.app import create_app
+from kestrel.config import Settings
+from kestrel.services.proxy import ProxyService
 
 
 @pytest.fixture
 def settings() -> Settings:
     return Settings(
-        database_url="postgresql+asyncpg://localhost:5432/agentrouter_test",
+        database_url="postgresql+asyncpg://localhost:5432/kestrel_test",
         openai_base_url="https://api.openai.com/v1",
         dev_mode=True,
         dev_openai_api_key="sk-test-key",

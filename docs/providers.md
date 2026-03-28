@@ -1,6 +1,6 @@
 # Providers
 
-AgentRouter supports 4 LLM providers with automatic format translation. All requests and responses use the OpenAI Chat Completions format.
+Kestrel supports 4 LLM providers with automatic format translation. All requests and responses use the OpenAI Chat Completions format.
 
 ## Supported Providers
 
@@ -70,7 +70,7 @@ For **non-OpenAI APIs** (different format):
 
 ## Provider Health & Failover
 
-AgentRouter monitors provider health with background pings every 30 seconds. If a provider returns 429/5xx or times out, the request automatically fails over to an equivalent model on a different provider.
+Kestrel monitors provider health with background pings every 30 seconds. If a provider returns 429/5xx or times out, the request automatically fails over to an equivalent model on a different provider.
 
 Failover equivalences:
 

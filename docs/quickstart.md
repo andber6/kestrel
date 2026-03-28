@@ -5,12 +5,12 @@
 The fastest way to get a running proxy.
 
 ```bash
-git clone https://github.com/agentrouter/agentrouter.git
-cd agentrouter
+git clone https://github.com/usekestrel/kestrel.git
+cd kestrel
 
 # Configure
 cp .env.example .env
-# Edit .env — add at least one provider API key (e.g. AR_DEV_OPENAI_API_KEY)
+# Edit .env — add at least one provider API key (e.g. KS_DEV_OPENAI_API_KEY)
 
 # Start
 docker compose up
@@ -36,15 +36,15 @@ curl http://localhost:8080/v1/chat/completions \
 ## Option 2: Local Development
 
 ```bash
-git clone https://github.com/agentrouter/agentrouter.git
-cd agentrouter/packages/core
+git clone https://github.com/usekestrel/kestrel.git
+cd kestrel/packages/core
 
 # Install dependencies
 uv sync --all-extras
 
 # Start the proxy in dev mode
-AR_DEV_MODE=true AR_DEV_OPENAI_API_KEY=sk-your-key \
-  uv run uvicorn agentrouter.app:create_app --factory --reload --port 8080
+KS_DEV_MODE=true KS_DEV_OPENAI_API_KEY=sk-your-key \
+  uv run uvicorn kestrel.app:create_app --factory --reload --port 8080
 ```
 
 Or use the Makefile (from the project root):
@@ -57,15 +57,15 @@ make dev  # starts on port 8080 with --reload
 ## Option 3: Python SDK
 
 ```bash
-pip install agentrouter
+pip install kestrel
 ```
 
 ```python
-import agentrouter
+import kestrel
 
-# Point at your running AgentRouter proxy
-client = agentrouter.Client(
-    api_key="ar-your-agentrouter-key",
+# Point at your running Kestrel proxy
+client = kestrel.Client(
+    api_key="ks-your-kestrel-key",
     provider_key="sk-your-openai-key",
     base_url="http://localhost:8080/v1",
 )
@@ -80,7 +80,7 @@ print(response.choices[0].message.content)
 
 ## Using Any Supported Model
 
-AgentRouter auto-detects the provider from the model name:
+Kestrel auto-detects the provider from the model name:
 
 ```python
 # OpenAI

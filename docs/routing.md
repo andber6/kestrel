@@ -1,6 +1,6 @@
 # Routing
 
-AgentRouter analyzes every incoming request and decides whether a cheaper model can handle it. This page explains how the routing pipeline works.
+Kestrel analyzes every incoming request and decides whether a cheaper model can handle it. This page explains how the routing pipeline works.
 
 ## Overview
 
@@ -90,7 +90,7 @@ The composite score (5-25) maps to three tiers:
 
 ## Model Ceiling
 
-The model you specify in the request acts as a **ceiling** — AgentRouter will never route to a more expensive model, only cheaper ones.
+The model you specify in the request acts as a **ceiling** — Kestrel will never route to a more expensive model, only cheaper ones.
 
 | Requested Model | Ceiling Tier | Can route to |
 |----------------|-------------|-------------|
@@ -105,11 +105,11 @@ If you request `claude-haiku-4-5` (Economy), the request stays at Economy regard
 
 | Environment Variable | Effect |
 |---------------------|--------|
-| `AR_ROUTING_ENABLED` | Set to `false` to disable routing entirely (pass-through mode) |
-| `AR_ROUTING_TIER_FLOOR` | Minimum tier — never route below this (e.g. `standard`) |
-| `AR_ROUTING_TIER_CEILING` | Maximum tier — never route above this |
-| `AR_ROUTING_ALLOWED_PROVIDERS` | Comma-separated list of providers to consider |
-| `AR_ROUTING_DENIED_PROVIDERS` | Comma-separated list of providers to exclude |
+| `KS_ROUTING_ENABLED` | Set to `false` to disable routing entirely (pass-through mode) |
+| `KS_ROUTING_TIER_FLOOR` | Minimum tier — never route below this (e.g. `standard`) |
+| `KS_ROUTING_TIER_CEILING` | Maximum tier — never route above this |
+| `KS_ROUTING_ALLOWED_PROVIDERS` | Comma-separated list of providers to consider |
+| `KS_ROUTING_DENIED_PROVIDERS` | Comma-separated list of providers to exclude |
 
 ## Extensibility
 

@@ -6,8 +6,8 @@ import json
 
 import httpx
 
-from agentrouter.models.openai import ChatCompletionRequest
-from agentrouter.providers.anthropic import AnthropicProvider
+from kestrel.models.openai import ChatCompletionRequest
+from kestrel.providers.anthropic import AnthropicProvider
 
 
 def _make_provider() -> AnthropicProvider:

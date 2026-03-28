@@ -6,8 +6,8 @@ import json
 
 import httpx
 
-from agentrouter.models.openai import ChatCompletionRequest
-from agentrouter.providers.gemini import GeminiProvider
+from kestrel.models.openai import ChatCompletionRequest
+from kestrel.providers.gemini import GeminiProvider
 
 
 def _make_provider() -> GeminiProvider:

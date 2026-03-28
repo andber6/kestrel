@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from agentrouter.models.openai import ChatCompletionRequest
-from agentrouter.routing.analyzer import analyze_request
+from kestrel.models.openai import ChatCompletionRequest
+from kestrel.routing.analyzer import analyze_request
 
 
 class TestAnalyzer:

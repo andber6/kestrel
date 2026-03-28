@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import httpx
 
-from agentrouter.models.openai import ChatCompletionRequest
-from agentrouter.providers.together import TogetherProvider
+from kestrel.models.openai import ChatCompletionRequest
+from kestrel.providers.together import TogetherProvider
 
 
 def _make_provider() -> TogetherProvider:

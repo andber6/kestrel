@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from agentrouter.models.openai import ChatCompletionRequest
-from agentrouter.routing.engine import RoutingEngine
-from agentrouter.routing.models import Tier
+from kestrel.models.openai import ChatCompletionRequest
+from kestrel.routing.engine import RoutingEngine
+from kestrel.routing.models import Tier
 
 
 def _engine(**kwargs: object) -> RoutingEngine:

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import httpx
 
-from agentrouter.models.openai import ChatCompletionRequest
-from agentrouter.providers.mistral import MistralProvider
+from kestrel.models.openai import ChatCompletionRequest
+from kestrel.providers.mistral import MistralProvider
 
 
 def _make_provider() -> MistralProvider:

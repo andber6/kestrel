@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import httpx
 
-from agentrouter.config import Settings
-from agentrouter.services.provider_registry import ProviderRegistry
+from kestrel.config import Settings
+from kestrel.services.provider_registry import ProviderRegistry
 
 
 def _make_registry(**api_keys: str) -> ProviderRegistry:

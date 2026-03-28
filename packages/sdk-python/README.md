@@ -1,25 +1,25 @@
-# AgentRouter Python SDK
+# Kestrel Python SDK
 
 Drop-in LLM cost optimization. Route requests to the cheapest capable model with one line of code.
 
 ## Install
 
 ```bash
-pip install agentrouter
+pip install kestrel
 ```
 
 ## Usage
 
 ```python
-import agentrouter
+import kestrel
 
-client = agentrouter.Client(
-    api_key="ar-your-agentrouter-key",
+client = kestrel.Client(
+    api_key="ks-your-kestrel-key",
     provider_key="sk-your-openai-key",
     base_url="http://localhost:8080/v1",
 )
 
-# Send requests as usual — AgentRouter handles routing
+# Send requests as usual — Kestrel handles routing
 response = client.chat.completions.create(
     model="gpt-4o",
     messages=[{"role": "user", "content": "What is 2+2?"}],
@@ -31,10 +31,10 @@ The SDK is a thin wrapper over the [OpenAI Python SDK](https://github.com/openai
 ## Async
 
 ```python
-import agentrouter
+import kestrel
 
-client = agentrouter.AsyncClient(
-    api_key="ar-your-key",
+client = kestrel.AsyncClient(
+    api_key="ks-your-key",
     provider_key="sk-your-openai-key",
 )
 
@@ -46,5 +46,5 @@ response = await client.chat.completions.create(
 
 ## Learn More
 
-- [AgentRouter documentation](https://github.com/agentrouter/agentrouter)
-- [How routing works](https://github.com/agentrouter/agentrouter/blob/main/docs/routing.md)
+- [Kestrel documentation](https://github.com/usekestrel/kestrel)
+- [How routing works](https://github.com/usekestrel/kestrel/blob/main/docs/routing.md)

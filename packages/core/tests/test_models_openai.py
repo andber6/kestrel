@@ -2,7 +2,7 @@
 
 import json
 
-from agentrouter.models.openai import (
+from kestrel.models.openai import (
     ChatCompletionChunk,
     ChatCompletionRequest,
     ChatCompletionResponse,

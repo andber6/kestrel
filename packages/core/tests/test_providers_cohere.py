@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import httpx
 
-from agentrouter.models.openai import ChatCompletionRequest
-from agentrouter.providers.cohere import CohereProvider
+from kestrel.models.openai import ChatCompletionRequest
+from kestrel.providers.cohere import CohereProvider
 
 
 def _make_provider() -> CohereProvider:

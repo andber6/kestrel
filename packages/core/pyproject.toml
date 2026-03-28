@@ -1,5 +1,5 @@
 [project]
-name = "agentrouter"
+name = "kestrel"
 version = "0.1.0"
 description = "Drop-in LLM API proxy that routes requests to the cheapest capable model"
 requires-python = ">=3.12"
@@ -25,14 +25,14 @@ dev = [
 ]
 
 [project.scripts]
-agentrouter = "agentrouter.cli:main"
+kestrel = "kestrel.cli:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/agentrouter"]
+packages = ["src/kestrel"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -11,7 +11,7 @@ from tests.conftest import SAMPLE_CHAT_REQUEST, SAMPLE_OPENAI_RESPONSE
 class TestNonStreamingProxy:
     @respx.mock
     async def test_proxies_request_to_openai(self, client: httpx.AsyncClient) -> None:
-        """Full round-trip: client → AgentRouter → mocked OpenAI → client."""
+        """Full round-trip: client → Kestrel → mocked OpenAI → client."""
         respx.post("https://api.openai.com/v1/chat/completions").mock(
             return_value=httpx.Response(200, json=SAMPLE_OPENAI_RESPONSE)
         )

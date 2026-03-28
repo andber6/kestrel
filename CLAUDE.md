@@ -1,20 +1,20 @@
-# CLAUDE.md — AgentRouter
+# CLAUDE.md — Kestrel
 
 ## What This Project Is
 
-AgentRouter is a drop-in LLM API proxy that intercepts requests, classifies prompt complexity, and routes to the cheapest capable model. One base_url change, 50-80% cost savings.
+Kestrel is a drop-in LLM API proxy that intercepts requests, classifies prompt complexity, and routes to the cheapest capable model. One base_url change, 50-80% cost savings.
 
-This repo is the **open-source core** (MIT license). The closed-source hosted service (billing, ML classifier, semantic cache) lives in a separate `agentrouter-server` repo.
+This repo is the **open-source core** (MIT license). The closed-source hosted service (billing, ML classifier, semantic cache) lives in a separate `kestrel-server` repo.
 
 ## Repository Structure
 
 ```
-agentrouter/
+kestrel/
 ├── packages/
 │   ├── core/               ← The proxy server (FastAPI + Python 3.12+)
-│   │   ├── src/agentrouter/
+│   │   ├── src/kestrel/
 │   │   │   ├── app.py              FastAPI factory, lifespan
-│   │   │   ├── config.py           Settings (AR_ env vars, pydantic-settings)
+│   │   │   ├── config.py           Settings (KS_ env vars, pydantic-settings)
 │   │   │   ├── providers/          LLM adapters (OpenAI, Anthropic, Gemini, Groq)
 │   │   │   ├── routing/            Complexity analysis → scoring → tier → model
 │   │   │   ├── services/           Proxy orchestration, registry, health, logging
@@ -50,7 +50,7 @@ make sdk-test     # Run SDK tests (10 tests)
 - **Lint**: Ruff, line length 99
 - **Types**: mypy strict mode with pydantic plugin
 - **Tests**: pytest + pytest-asyncio, mode=auto. All external calls mocked with `respx`
-- **Config**: All settings via env vars with `AR_` prefix (see `.env.example`)
+- **Config**: All settings via env vars with `KS_` prefix (see `.env.example`)
 - **Working directory**: Most commands expect `packages/core/` as cwd (Makefile handles this)
 
 ## Architecture Quick Reference
@@ -66,15 +66,15 @@ HTTP → `routes/chat.py` → `services/proxy.py` → `routing/engine.py` (analy
 **Routing scorer is pluggable:** The `Scorer` protocol in `routing/models.py` allows the rule-based heuristics to be replaced by an ML classifier without touching other code.
 
 **Auth supports two patterns:**
-1. `X-AgentRouter-Key: ar-...` + `Authorization: Bearer sk-...` (provider key)
-2. `Authorization: Bearer ar-...` (AR key only, provider key from DB)
+1. `X-Kestrel-Key: ar-...` + `Authorization: Bearer sk-...` (provider key)
+2. `Authorization: Bearer ar-...` (Kestrel key only, provider key from DB)
 
-**Dev mode** (`AR_DEV_MODE=true`): bypasses auth, uses `AR_DEV_*_API_KEY` settings directly.
+**Dev mode** (`KS_DEV_MODE=true`): bypasses auth, uses `KS_DEV_*_API_KEY` settings directly.
 
 ## What NOT to Put in This Repo
 
-- Billing/Stripe code → goes in `agentrouter-server` (private)
-- ML classifier model → goes in `agentrouter-server` (private)
-- Semantic cache → goes in `agentrouter-server` (private)
-- Dashboard frontend → goes in `agentrouter-server` (private)
+- Billing/Stripe code → goes in `kestrel-server` (private)
+- ML classifier model → goes in `kestrel-server` (private)
+- Semantic cache → goes in `kestrel-server` (private)
+- Dashboard frontend → goes in `kestrel-server` (private)
 - Real API keys or `.env` files

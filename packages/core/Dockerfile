@@ -22,4 +22,4 @@ COPY alembic.ini alembic.ini
 ENV PATH="/app/.venv/bin:$PATH"
 EXPOSE 8080
 
-CMD ["uvicorn", "agentrouter.app:create_app", "--factory", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "kestrel.app:create_app", "--factory", "--host", "0.0.0.0", "--port", "8080"]

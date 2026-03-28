@@ -1,12 +1,12 @@
-# Contributing to AgentRouter
+# Contributing to Kestrel
 
 ## Development Setup
 
 1. Clone the repo and install dependencies:
 
 ```bash
-git clone https://github.com/agentrouter/agentrouter.git
-cd agentrouter/packages/core
+git clone https://github.com/usekestrel/kestrel.git
+cd kestrel/packages/core
 uv sync --all-extras
 ```
 
@@ -34,7 +34,7 @@ All 128+ tests use mocked providers — no real API calls, no database needed.
 
 ## Adding a New Provider
 
-1. **Create the adapter** in `src/agentrouter/providers/your_provider.py`
+1. **Create the adapter** in `src/kestrel/providers/your_provider.py`
 
    - For OpenAI-compatible APIs (same request/response format), subclass `OpenAICompatibleProvider` from `providers/openai_compat.py` and override `translate_request()` to strip unsupported fields. See `providers/groq.py` for an example.
    - For non-OpenAI APIs, subclass `LLMProvider` from `providers/base.py` and implement all methods: `chat_completion()`, `chat_completion_stream()`, `translate_request()`, `translate_response()`. See `providers/anthropic.py` for a complete example.

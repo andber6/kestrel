@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from agentrouter.models.openai import ChatCompletionRequest
-from agentrouter.providers.groq import GroqProvider
+from kestrel.models.openai import ChatCompletionRequest
+from kestrel.providers.groq import GroqProvider
 
 
 def _make_provider() -> GroqProvider:

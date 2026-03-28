@@ -3,9 +3,9 @@
 ## Directory Structure
 
 ```
-packages/core/src/agentrouter/
+packages/core/src/kestrel/
   app.py                    FastAPI application factory + lifespan management
-  config.py                 Settings loaded from AR_ environment variables
+  config.py                 Settings loaded from KS_ environment variables
   dependencies.py           FastAPI dependency injection (auth, proxy service)
 
   auth/
@@ -56,7 +56,7 @@ packages/core/src/agentrouter/
    │
 3. ├─ Authentication (dependencies.py → auth/api_key.py)
    │   ├─ Dev mode: bypass, use dev keys
-   │   ├─ Pattern 1: X-AgentRouter-Key + Authorization (provider key)
+   │   ├─ Pattern 1: X-Kestrel-Key + Authorization (provider key)
    │   └─ Pattern 2: Authorization: Bearer ar-... (provider key from DB)
    │
 4. ├─ Proxy Service (services/proxy.py)
