@@ -35,8 +35,8 @@ async def client(settings: Settings) -> AsyncGenerator[httpx.AsyncClient, None]:
     app.state.session_factory = AsyncMock()
     app.state.proxy_service = ProxyService(
         http_client=http_client,
+        settings=settings,
         log_service=None,  # No DB logging in tests
-        openai_base_url=settings.openai_base_url,
     )
 
     async with httpx.AsyncClient(

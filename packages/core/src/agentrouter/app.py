@@ -41,8 +41,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     log_service = RequestLogService(session_factory)
     app.state.proxy_service = ProxyService(
         http_client=http_client,
+        settings=settings,
         log_service=log_service,
-        openai_base_url=settings.openai_base_url,
     )
 
     logger.info("AgentRouter started (dev_mode=%s)", settings.dev_mode)
