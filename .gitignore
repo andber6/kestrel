@@ -1,3 +1,6 @@
+# Claude Code (contains local plans and settings — never commit)
+.claude/
+
 # Python
 __pycache__/
 *.py[cod]
