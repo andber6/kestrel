@@ -51,10 +51,7 @@ class GeminiProvider(LLMProvider):
         return f"{self._base_url}/models/{model}:generateContent?key={self._api_key}"
 
     def _stream_url(self, model: str) -> str:
-        return (
-            f"{self._base_url}/models/{model}:streamGenerateContent"
-            f"?key={self._api_key}&alt=sse"
-        )
+        return f"{self._base_url}/models/{model}:streamGenerateContent?key={self._api_key}&alt=sse"
 
     def _timeout(self) -> httpx.Timeout:
         return httpx.Timeout(
@@ -102,20 +99,20 @@ class GeminiProvider(LLMProvider):
 
             if role == "assistant" and msg.tool_calls:
                 for tc in msg.tool_calls:
-                    parts.append({
-                        "functionCall": {
-                            "name": tc.function.name,
-                            "args": json.loads(tc.function.arguments),
+                    parts.append(
+                        {
+                            "functionCall": {
+                                "name": tc.function.name,
+                                "args": json.loads(tc.function.arguments),
+                            }
                         }
-                    })
+                    )
             elif isinstance(content, str) and content:
                 parts.append({"text": content})
             elif isinstance(content, list):
                 for part in content:
                     part_dict = (
-                        part.model_dump(exclude_none=True)
-                        if hasattr(part, "model_dump")
-                        else part
+                        part.model_dump(exclude_none=True) if hasattr(part, "model_dump") else part
                     )
                     if part_dict.get("type") == "text":
                         parts.append({"text": part_dict["text"]})
@@ -124,12 +121,14 @@ class GeminiProvider(LLMProvider):
                         if url.startswith("data:"):
                             media_type, _, b64_data = url.partition(";base64,")
                             media_type = media_type.replace("data:", "")
-                            parts.append({
-                                "inlineData": {
-                                    "mimeType": media_type,
-                                    "data": b64_data,
+                            parts.append(
+                                {
+                                    "inlineData": {
+                                        "mimeType": media_type,
+                                        "data": b64_data,
+                                    }
                                 }
-                            })
+                            )
 
             if parts:
                 contents.append({"role": gemini_role, "parts": parts})
@@ -137,9 +136,7 @@ class GeminiProvider(LLMProvider):
         body: dict[str, Any] = {"contents": contents}
 
         if system_parts:
-            body["systemInstruction"] = {
-                "parts": [{"text": t} for t in system_parts]
-            }
+            body["systemInstruction"] = {"parts": [{"text": t} for t in system_parts]}
 
         # Generation config
         gen_config: dict[str, Any] = {}
@@ -155,10 +152,7 @@ class GeminiProvider(LLMProvider):
             gen_config["stopSequences"] = (
                 request.stop if isinstance(request.stop, list) else [request.stop]
             )
-        if (
-            request.response_format is not None
-            and request.response_format.type == "json_object"
-        ):
+        if request.response_format is not None and request.response_format.type == "json_object":
             gen_config["responseMimeType"] = "application/json"
 
         if gen_config:
@@ -166,16 +160,18 @@ class GeminiProvider(LLMProvider):
 
         # Tools
         if request.tools:
-            body["tools"] = [{
-                "functionDeclarations": [
-                    {
-                        "name": t.function.name,
-                        "description": t.function.description or "",
-                        "parameters": t.function.parameters or {"type": "OBJECT"},
-                    }
-                    for t in request.tools
-                ]
-            }]
+            body["tools"] = [
+                {
+                    "functionDeclarations": [
+                        {
+                            "name": t.function.name,
+                            "description": t.function.description or "",
+                            "parameters": t.function.parameters or {"type": "OBJECT"},
+                        }
+                        for t in request.tools
+                    ]
+                }
+            ]
 
         return body
 
@@ -196,14 +192,16 @@ class GeminiProvider(LLMProvider):
                 text_parts.append(part["text"])
             elif "functionCall" in part:
                 fc = part["functionCall"]
-                tool_calls.append({
-                    "id": f"call_{uuid.uuid4().hex[:8]}",
-                    "type": "function",
-                    "function": {
-                        "name": fc["name"],
-                        "arguments": json.dumps(fc.get("args", {})),
-                    },
-                })
+                tool_calls.append(
+                    {
+                        "id": f"call_{uuid.uuid4().hex[:8]}",
+                        "type": "function",
+                        "function": {
+                            "name": fc["name"],
+                            "arguments": json.dumps(fc.get("args", {})),
+                        },
+                    }
+                )
 
         message: dict[str, Any] = {"role": "assistant"}
         message["content"] = "\n".join(text_parts) if text_parts else None
@@ -220,24 +218,22 @@ class GeminiProvider(LLMProvider):
             "total_tokens": usage_meta.get("totalTokenCount", 0),
         }
 
-        return ChatCompletionResponse.model_validate({
-            "id": f"chatcmpl-{uuid.uuid4().hex[:12]}",
-            "object": "chat.completion",
-            "created": int(time.time()),
-            "model": raw.get("modelVersion", ""),
-            "choices": [
-                {"index": 0, "message": message, "finish_reason": finish_reason}
-            ],
-            "usage": usage,
-        })
+        return ChatCompletionResponse.model_validate(
+            {
+                "id": f"chatcmpl-{uuid.uuid4().hex[:12]}",
+                "object": "chat.completion",
+                "created": int(time.time()),
+                "model": raw.get("modelVersion", ""),
+                "choices": [{"index": 0, "message": message, "finish_reason": finish_reason}],
+                "usage": usage,
+            }
+        )
 
     # ------------------------------------------------------------------
     # Non-streaming
     # ------------------------------------------------------------------
 
-    async def chat_completion(
-        self, request: ChatCompletionRequest
-    ) -> ChatCompletionResponse:
+    async def chat_completion(self, request: ChatCompletionRequest) -> ChatCompletionResponse:
         body = self.translate_request(request)
         response = await self._http_client.post(
             self._generate_url(request.model),
@@ -286,9 +282,7 @@ class GeminiProvider(LLMProvider):
 
                 # Emit role chunk once
                 if not sent_role:
-                    chunk = _make_chunk(
-                        completion_id, created, model, delta={"role": "assistant"}
-                    )
+                    chunk = _make_chunk(completion_id, created, model, delta={"role": "assistant"})
                     yield f"data: {json.dumps(chunk)}\n\n"
                     sent_role = True
 
@@ -336,9 +330,7 @@ def _make_chunk(
         "object": "chat.completion.chunk",
         "created": created,
         "model": model,
-        "choices": [
-            {"index": 0, "delta": delta, "finish_reason": finish_reason}
-        ],
+        "choices": [{"index": 0, "delta": delta, "finish_reason": finish_reason}],
     }
 
 

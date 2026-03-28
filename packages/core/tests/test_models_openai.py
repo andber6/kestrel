@@ -340,9 +340,7 @@ class TestStreamingModels:
             "object": "chat.completion.chunk",
             "created": 1700000000,
             "model": "gpt-4o",
-            "choices": [
-                {"index": 0, "delta": {"role": "assistant"}, "finish_reason": None}
-            ],
+            "choices": [{"index": 0, "delta": {"role": "assistant"}, "finish_reason": None}],
         }
         chunk = ChatCompletionChunk.model_validate(data)
         assert chunk.choices[0].delta.role == "assistant"
@@ -354,9 +352,7 @@ class TestStreamingModels:
             "object": "chat.completion.chunk",
             "created": 1700000000,
             "model": "gpt-4o",
-            "choices": [
-                {"index": 0, "delta": {"content": "Hello"}, "finish_reason": None}
-            ],
+            "choices": [{"index": 0, "delta": {"content": "Hello"}, "finish_reason": None}],
         }
         chunk = ChatCompletionChunk.model_validate(data)
         assert chunk.choices[0].delta.content == "Hello"
@@ -387,15 +383,15 @@ class TestStreamingModels:
         assert chunk.usage.total_tokens == 15
 
     def test_chunk_round_trip_json(self) -> None:
-        raw = json.dumps({
-            "id": "x",
-            "object": "chat.completion.chunk",
-            "created": 1,
-            "model": "gpt-4o",
-            "choices": [
-                {"index": 0, "delta": {"content": "Hi"}, "finish_reason": None}
-            ],
-        })
+        raw = json.dumps(
+            {
+                "id": "x",
+                "object": "chat.completion.chunk",
+                "created": 1,
+                "model": "gpt-4o",
+                "choices": [{"index": 0, "delta": {"content": "Hi"}, "finish_reason": None}],
+            }
+        )
         chunk = ChatCompletionChunk.model_validate_json(raw)
         re_serialized = json.loads(chunk.model_dump_json(exclude_none=True))
         assert re_serialized["choices"][0]["delta"]["content"] == "Hi"

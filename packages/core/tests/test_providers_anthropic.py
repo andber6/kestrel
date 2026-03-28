@@ -21,10 +21,12 @@ def _make_provider() -> AnthropicProvider:
 
 class TestRequestTranslation:
     def test_basic_message(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "claude-sonnet-4-6",
-            "messages": [{"role": "user", "content": "Hello"}],
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "claude-sonnet-4-6",
+                "messages": [{"role": "user", "content": "Hello"}],
+            }
+        )
         body = _make_provider().translate_request(req)
 
         assert body["model"] == "claude-sonnet-4-6"
@@ -35,13 +37,15 @@ class TestRequestTranslation:
         assert "system" not in body
 
     def test_system_message_extracted(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "claude-sonnet-4-6",
-            "messages": [
-                {"role": "system", "content": "You are helpful."},
-                {"role": "user", "content": "Hi"},
-            ],
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "claude-sonnet-4-6",
+                "messages": [
+                    {"role": "system", "content": "You are helpful."},
+                    {"role": "user", "content": "Hi"},
+                ],
+            }
+        )
         body = _make_provider().translate_request(req)
 
         assert body["system"] == "You are helpful."
@@ -49,84 +53,100 @@ class TestRequestTranslation:
         assert body["messages"][0]["role"] == "user"
 
     def test_multiple_system_messages_merged(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "claude-sonnet-4-6",
-            "messages": [
-                {"role": "system", "content": "Rule 1"},
-                {"role": "system", "content": "Rule 2"},
-                {"role": "user", "content": "Go"},
-            ],
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "claude-sonnet-4-6",
+                "messages": [
+                    {"role": "system", "content": "Rule 1"},
+                    {"role": "system", "content": "Rule 2"},
+                    {"role": "user", "content": "Go"},
+                ],
+            }
+        )
         body = _make_provider().translate_request(req)
 
         assert body["system"] == "Rule 1\n\nRule 2"
 
     def test_developer_role_becomes_system(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "claude-sonnet-4-6",
-            "messages": [
-                {"role": "developer", "content": "Developer instructions"},
-                {"role": "user", "content": "Hi"},
-            ],
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "claude-sonnet-4-6",
+                "messages": [
+                    {"role": "developer", "content": "Developer instructions"},
+                    {"role": "user", "content": "Hi"},
+                ],
+            }
+        )
         body = _make_provider().translate_request(req)
 
         assert body["system"] == "Developer instructions"
 
     def test_max_tokens_forwarded(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "claude-sonnet-4-6",
-            "messages": [{"role": "user", "content": "Hi"}],
-            "max_tokens": 500,
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "claude-sonnet-4-6",
+                "messages": [{"role": "user", "content": "Hi"}],
+                "max_tokens": 500,
+            }
+        )
         body = _make_provider().translate_request(req)
         assert body["max_tokens"] == 500
 
     def test_temperature_and_top_p(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "claude-sonnet-4-6",
-            "messages": [{"role": "user", "content": "Hi"}],
-            "temperature": 0.7,
-            "top_p": 0.9,
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "claude-sonnet-4-6",
+                "messages": [{"role": "user", "content": "Hi"}],
+                "temperature": 0.7,
+                "top_p": 0.9,
+            }
+        )
         body = _make_provider().translate_request(req)
         assert body["temperature"] == 0.7
         assert body["top_p"] == 0.9
 
     def test_stop_sequences(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "claude-sonnet-4-6",
-            "messages": [{"role": "user", "content": "Hi"}],
-            "stop": ["END", "STOP"],
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "claude-sonnet-4-6",
+                "messages": [{"role": "user", "content": "Hi"}],
+                "stop": ["END", "STOP"],
+            }
+        )
         body = _make_provider().translate_request(req)
         assert body["stop_sequences"] == ["END", "STOP"]
 
     def test_stop_single_string(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "claude-sonnet-4-6",
-            "messages": [{"role": "user", "content": "Hi"}],
-            "stop": "\n",
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "claude-sonnet-4-6",
+                "messages": [{"role": "user", "content": "Hi"}],
+                "stop": "\n",
+            }
+        )
         body = _make_provider().translate_request(req)
         assert body["stop_sequences"] == ["\n"]
 
     def test_tool_definitions(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "claude-sonnet-4-6",
-            "messages": [{"role": "user", "content": "Weather?"}],
-            "tools": [{
-                "type": "function",
-                "function": {
-                    "name": "get_weather",
-                    "description": "Get weather for a location",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {"city": {"type": "string"}},
-                    },
-                },
-            }],
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "claude-sonnet-4-6",
+                "messages": [{"role": "user", "content": "Weather?"}],
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "get_weather",
+                            "description": "Get weather for a location",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {"city": {"type": "string"}},
+                            },
+                        },
+                    }
+                ],
+            }
+        )
         body = _make_provider().translate_request(req)
 
         assert len(body["tools"]) == 1
@@ -135,29 +155,33 @@ class TestRequestTranslation:
         assert "input_schema" in body["tools"][0]
 
     def test_assistant_tool_calls_become_tool_use(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "claude-sonnet-4-6",
-            "messages": [
-                {"role": "user", "content": "Weather?"},
-                {
-                    "role": "assistant",
-                    "content": None,
-                    "tool_calls": [{
-                        "id": "call_1",
-                        "type": "function",
-                        "function": {
-                            "name": "get_weather",
-                            "arguments": '{"city": "NYC"}',
-                        },
-                    }],
-                },
-                {
-                    "role": "tool",
-                    "content": '{"temp": 72}',
-                    "tool_call_id": "call_1",
-                },
-            ],
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "claude-sonnet-4-6",
+                "messages": [
+                    {"role": "user", "content": "Weather?"},
+                    {
+                        "role": "assistant",
+                        "content": None,
+                        "tool_calls": [
+                            {
+                                "id": "call_1",
+                                "type": "function",
+                                "function": {
+                                    "name": "get_weather",
+                                    "arguments": '{"city": "NYC"}',
+                                },
+                            }
+                        ],
+                    },
+                    {
+                        "role": "tool",
+                        "content": '{"temp": 72}',
+                        "tool_call_id": "call_1",
+                    },
+                ],
+            }
+        )
         body = _make_provider().translate_request(req)
 
         # Assistant message should have tool_use block
@@ -174,36 +198,38 @@ class TestRequestTranslation:
         assert tool_msg["content"][0]["tool_use_id"] == "call_1"
 
     def test_consecutive_tool_results_merged(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "claude-sonnet-4-6",
-            "messages": [
-                {"role": "user", "content": "Get weather and time"},
-                {
-                    "role": "assistant",
-                    "content": None,
-                    "tool_calls": [
-                        {
-                            "id": "call_1",
-                            "type": "function",
-                            "function": {
-                                "name": "get_weather",
-                                "arguments": "{}",
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "claude-sonnet-4-6",
+                "messages": [
+                    {"role": "user", "content": "Get weather and time"},
+                    {
+                        "role": "assistant",
+                        "content": None,
+                        "tool_calls": [
+                            {
+                                "id": "call_1",
+                                "type": "function",
+                                "function": {
+                                    "name": "get_weather",
+                                    "arguments": "{}",
+                                },
                             },
-                        },
-                        {
-                            "id": "call_2",
-                            "type": "function",
-                            "function": {
-                                "name": "get_time",
-                                "arguments": "{}",
+                            {
+                                "id": "call_2",
+                                "type": "function",
+                                "function": {
+                                    "name": "get_time",
+                                    "arguments": "{}",
+                                },
                             },
-                        },
-                    ],
-                },
-                {"role": "tool", "content": "72F", "tool_call_id": "call_1"},
-                {"role": "tool", "content": "3pm", "tool_call_id": "call_2"},
-            ],
-        })
+                        ],
+                    },
+                    {"role": "tool", "content": "72F", "tool_call_id": "call_1"},
+                    {"role": "tool", "content": "3pm", "tool_call_id": "call_2"},
+                ],
+            }
+        )
         body = _make_provider().translate_request(req)
 
         # Two tool results should be merged into one user message

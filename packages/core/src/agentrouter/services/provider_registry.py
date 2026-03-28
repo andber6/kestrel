@@ -12,9 +12,12 @@ import httpx
 from agentrouter.config import Settings
 from agentrouter.providers.anthropic import AnthropicProvider
 from agentrouter.providers.base import LLMProvider
+from agentrouter.providers.cohere import CohereProvider
 from agentrouter.providers.gemini import GeminiProvider
 from agentrouter.providers.groq import GroqProvider
+from agentrouter.providers.mistral import MistralProvider
 from agentrouter.providers.openai import OpenAIProvider
+from agentrouter.providers.together import TogetherProvider
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +36,16 @@ _MODEL_PROVIDER_MAP: dict[str, str] = {
     "llama": "groq",
     "mixtral": "groq",
     "gemma": "groq",
+    # Mistral
+    "mistral-": "mistral",
+    "codestral": "mistral",
+    "pixtral": "mistral",
+    # Cohere
+    "command-": "cohere",
+    # Together AI (uses full model paths)
+    "meta-llama/": "together",
+    "mistralai/": "together",
+    "qwen/": "together",
 }
 
 # Model equivalence for failover: model → list of fallback models (in priority order)
@@ -49,6 +62,12 @@ MODEL_EQUIVALENTS: dict[str, list[str]] = {
     # Economy tier (Groq)
     "llama-3.1-8b-instant": ["gpt-4o-mini", "gemini-1.5-flash"],
     "llama-3.1-70b-versatile": ["gpt-4o-mini", "claude-haiku-4-5"],
+    # Mistral
+    "mistral-large-latest": ["gpt-4o", "claude-sonnet-4-6"],
+    "mistral-small-latest": ["gpt-4o-mini", "claude-haiku-4-5"],
+    # Cohere
+    "command-r-plus": ["gpt-4o", "claude-sonnet-4-6"],
+    "command-r": ["gpt-4o-mini", "claude-haiku-4-5"],
 }
 
 
@@ -121,6 +140,36 @@ class ProviderRegistry:
                 ),
             )
 
+        if keys.get("mistral"):
+            registry.register(
+                "mistral",
+                MistralProvider(
+                    api_key=keys["mistral"],
+                    base_url=settings.mistral_base_url,
+                    http_client=http_client,
+                ),
+            )
+
+        if keys.get("cohere"):
+            registry.register(
+                "cohere",
+                CohereProvider(
+                    api_key=keys["cohere"],
+                    base_url=settings.cohere_base_url,
+                    http_client=http_client,
+                ),
+            )
+
+        if keys.get("together"):
+            registry.register(
+                "together",
+                TogetherProvider(
+                    api_key=keys["together"],
+                    base_url=settings.together_base_url,
+                    http_client=http_client,
+                ),
+            )
+
         return registry
 
     def register(self, name: str, provider: LLMProvider) -> None:
@@ -177,11 +226,7 @@ class ProviderRegistry:
 
     @property
     def available_providers(self) -> list[str]:
-        return [
-            name
-            for name, health in self._health.items()
-            if health.is_available
-        ]
+        return [name for name, health in self._health.items() if health.is_available]
 
     def get_health_status(self) -> dict[str, Any]:
         """Return health status for all providers (for /health endpoint)."""

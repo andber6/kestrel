@@ -24,6 +24,9 @@ dev = [
     "ruff>=0.8",
 ]
 
+[project.scripts]
+agentrouter = "agentrouter.cli:main"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

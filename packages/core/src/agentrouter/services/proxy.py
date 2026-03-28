@@ -53,6 +53,9 @@ class ProxyService:
                 "anthropic": self._settings.dev_anthropic_api_key,
                 "gemini": self._settings.dev_gemini_api_key,
                 "groq": self._settings.dev_groq_api_key,
+                "mistral": self._settings.dev_mistral_api_key,
+                "cohere": self._settings.dev_cohere_api_key,
+                "together": self._settings.dev_together_api_key,
             }
         else:
             # In production, the primary key comes from auth context.
@@ -87,9 +90,7 @@ class ProxyService:
             else None
         )
         floor = (
-            Tier(self._settings.routing_tier_floor)
-            if self._settings.routing_tier_floor
-            else None
+            Tier(self._settings.routing_tier_floor) if self._settings.routing_tier_floor else None
         )
         ceiling = (
             Tier(self._settings.routing_tier_ceiling)
@@ -126,9 +127,7 @@ class ProxyService:
 
         # Route to a cheaper model if possible
         routing_decision = self._maybe_route(request, registry)
-        effective_model = (
-            routing_decision.routed_model if routing_decision else request.model
-        )
+        effective_model = routing_decision.routed_model if routing_decision else request.model
 
         # Build list of (provider, model) to try
         attempts = self._build_attempt_list(registry, effective_model)
@@ -217,9 +216,7 @@ class ProxyService:
 
         # Route to a cheaper model if possible
         routing_decision = self._maybe_route(request, registry)
-        effective_model = (
-            routing_decision.routed_model if routing_decision else request.model
-        )
+        effective_model = routing_decision.routed_model if routing_decision else request.model
 
         attempts = self._build_attempt_list(registry, effective_model)
 
@@ -233,9 +230,7 @@ class ProxyService:
                 async for line in provider.chat_completion_stream(attempt_request):
                     if first_token_time is None:
                         first_token_time = time.monotonic()
-                        registry.mark_healthy(
-                            provider.name, _elapsed_ms(start)
-                        )
+                        registry.mark_healthy(provider.name, _elapsed_ms(start))
 
                     # Parse for logging, forward raw
                     data_str = line.strip()
@@ -250,9 +245,7 @@ class ProxyService:
 
                 # Stream completed successfully
                 latency_ms = _elapsed_ms(start)
-                ttft_ms = (
-                    int((first_token_time - start) * 1000) if first_token_time else None
-                )
+                ttft_ms = int((first_token_time - start) * 1000) if first_token_time else None
                 assembled = _assemble_chunks(chunks)
                 self._fire_log(
                     auth=auth,

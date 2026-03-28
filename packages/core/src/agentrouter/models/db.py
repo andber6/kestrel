@@ -23,6 +23,9 @@ class ApiKey(Base):
 
     # Operator's upstream provider credentials (encrypted at rest in production)
     openai_api_key_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    anthropic_api_key_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    gemini_api_key_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    groq_api_key_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

@@ -66,9 +66,7 @@ class OpenAICompatibleProvider(LLMProvider):
         """Default: OpenAI format is native."""
         return ChatCompletionResponse.model_validate(raw)
 
-    async def chat_completion(
-        self, request: ChatCompletionRequest
-    ) -> ChatCompletionResponse:
+    async def chat_completion(self, request: ChatCompletionRequest) -> ChatCompletionResponse:
         body = self.translate_request(request)
         body.pop("stream", None)
 

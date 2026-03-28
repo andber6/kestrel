@@ -29,6 +29,15 @@ _MODEL_TIER_MAP: dict[str, Tier] = {
     "claude-opus-4-6": Tier.PREMIUM,
     "gemini-1.5-pro": Tier.PREMIUM,
     "gemini-2.0-pro": Tier.PREMIUM,
+    # Mistral
+    "mistral-large-latest": Tier.PREMIUM,
+    "mistral-medium-latest": Tier.STANDARD,
+    "mistral-small-latest": Tier.STANDARD,
+    "codestral-latest": Tier.PREMIUM,
+    # Cohere
+    "command-r-plus": Tier.PREMIUM,
+    "command-r": Tier.STANDARD,
+    "command-light": Tier.ECONOMY,
 }
 
 _TIER_RANK = {Tier.ECONOMY: 0, Tier.STANDARD: 1, Tier.PREMIUM: 2}
@@ -75,22 +84,15 @@ def resolve_tier(
 
     # Apply operator ceiling if set
     if tier_ceiling and _TIER_RANK[final] > _TIER_RANK[tier_ceiling]:
-        reasons.append(
-            f"Clamped from {final.value} to {tier_ceiling.value} (operator ceiling)"
-        )
+        reasons.append(f"Clamped from {final.value} to {tier_ceiling.value} (operator ceiling)")
         final = tier_ceiling
 
     # Apply operator floor if set
     if tier_floor and _TIER_RANK[final] < _TIER_RANK[tier_floor]:
-        reasons.append(
-            f"Raised from {final.value} to {tier_floor.value} (operator floor)"
-        )
+        reasons.append(f"Raised from {final.value} to {tier_floor.value} (operator floor)")
         final = tier_floor
 
     if not reasons and classified_tier != model_ceiling:
-        reasons.append(
-            f"Classified as {classified_tier.value} "
-            f"(score {scores.total}/25)"
-        )
+        reasons.append(f"Classified as {classified_tier.value} (score {scores.total}/25)")
 
     return final, reasons

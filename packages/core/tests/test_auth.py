@@ -101,9 +101,7 @@ class TestPattern2BearerAR:
     async def test_ar_key_in_bearer_provider_from_db(self) -> None:
         ar_key = "ar-stored-key"
         hashed = hash_api_key(ar_key)
-        record = _make_api_key_record(
-            hashed, openai_api_key_encrypted="sk-from-db"
-        )
+        record = _make_api_key_record(hashed, openai_api_key_encrypted="sk-from-db")
         session = _mock_session(record)
 
         ctx = await authenticate_request(

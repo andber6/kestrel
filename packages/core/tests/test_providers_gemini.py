@@ -21,10 +21,12 @@ def _make_provider() -> GeminiProvider:
 
 class TestRequestTranslation:
     def test_basic_message(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "gemini-1.5-flash",
-            "messages": [{"role": "user", "content": "Hello"}],
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "gemini-1.5-flash",
+                "messages": [{"role": "user", "content": "Hello"}],
+            }
+        )
         body = _make_provider().translate_request(req)
 
         assert len(body["contents"]) == 1
@@ -32,13 +34,15 @@ class TestRequestTranslation:
         assert body["contents"][0]["parts"] == [{"text": "Hello"}]
 
     def test_system_message_to_system_instruction(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "gemini-1.5-flash",
-            "messages": [
-                {"role": "system", "content": "Be concise"},
-                {"role": "user", "content": "Hi"},
-            ],
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "gemini-1.5-flash",
+                "messages": [
+                    {"role": "system", "content": "Be concise"},
+                    {"role": "user", "content": "Hi"},
+                ],
+            }
+        )
         body = _make_provider().translate_request(req)
 
         assert "systemInstruction" in body
@@ -46,14 +50,16 @@ class TestRequestTranslation:
         assert len(body["contents"]) == 1
 
     def test_assistant_becomes_model_role(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "gemini-1.5-flash",
-            "messages": [
-                {"role": "user", "content": "Hi"},
-                {"role": "assistant", "content": "Hello!"},
-                {"role": "user", "content": "How are you?"},
-            ],
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "gemini-1.5-flash",
+                "messages": [
+                    {"role": "user", "content": "Hi"},
+                    {"role": "assistant", "content": "Hello!"},
+                    {"role": "user", "content": "How are you?"},
+                ],
+            }
+        )
         body = _make_provider().translate_request(req)
 
         assert body["contents"][0]["role"] == "user"
@@ -62,14 +68,16 @@ class TestRequestTranslation:
         assert body["contents"][2]["role"] == "user"
 
     def test_generation_config(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "gemini-1.5-flash",
-            "messages": [{"role": "user", "content": "Hi"}],
-            "temperature": 0.5,
-            "top_p": 0.8,
-            "max_tokens": 200,
-            "stop": ["END"],
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "gemini-1.5-flash",
+                "messages": [{"role": "user", "content": "Hi"}],
+                "temperature": 0.5,
+                "top_p": 0.8,
+                "max_tokens": 200,
+                "stop": ["END"],
+            }
+        )
         body = _make_provider().translate_request(req)
 
         gc = body["generationConfig"]
@@ -79,30 +87,36 @@ class TestRequestTranslation:
         assert gc["stopSequences"] == ["END"]
 
     def test_json_mode(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "gemini-1.5-flash",
-            "messages": [{"role": "user", "content": "JSON please"}],
-            "response_format": {"type": "json_object"},
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "gemini-1.5-flash",
+                "messages": [{"role": "user", "content": "JSON please"}],
+                "response_format": {"type": "json_object"},
+            }
+        )
         body = _make_provider().translate_request(req)
         assert body["generationConfig"]["responseMimeType"] == "application/json"
 
     def test_tool_definitions(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "gemini-1.5-flash",
-            "messages": [{"role": "user", "content": "Search"}],
-            "tools": [{
-                "type": "function",
-                "function": {
-                    "name": "search",
-                    "description": "Search the web",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {"query": {"type": "string"}},
-                    },
-                },
-            }],
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "gemini-1.5-flash",
+                "messages": [{"role": "user", "content": "Search"}],
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "search",
+                            "description": "Search the web",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {"query": {"type": "string"}},
+                            },
+                        },
+                    }
+                ],
+            }
+        )
         body = _make_provider().translate_request(req)
 
         decls = body["tools"][0]["functionDeclarations"]
@@ -110,29 +124,33 @@ class TestRequestTranslation:
         assert decls[0]["name"] == "search"
 
     def test_tool_calls_become_function_call(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "gemini-1.5-flash",
-            "messages": [
-                {"role": "user", "content": "Search for cats"},
-                {
-                    "role": "assistant",
-                    "content": None,
-                    "tool_calls": [{
-                        "id": "call_1",
-                        "type": "function",
-                        "function": {
-                            "name": "search",
-                            "arguments": '{"query": "cats"}',
-                        },
-                    }],
-                },
-                {
-                    "role": "tool",
-                    "content": '{"results": ["cat1"]}',
-                    "tool_call_id": "call_1",
-                },
-            ],
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "gemini-1.5-flash",
+                "messages": [
+                    {"role": "user", "content": "Search for cats"},
+                    {
+                        "role": "assistant",
+                        "content": None,
+                        "tool_calls": [
+                            {
+                                "id": "call_1",
+                                "type": "function",
+                                "function": {
+                                    "name": "search",
+                                    "arguments": '{"query": "cats"}',
+                                },
+                            }
+                        ],
+                    },
+                    {
+                        "role": "tool",
+                        "content": '{"results": ["cat1"]}',
+                        "tool_call_id": "call_1",
+                    },
+                ],
+            }
+        )
         body = _make_provider().translate_request(req)
 
         # Assistant message should have functionCall
@@ -154,10 +172,12 @@ class TestRequestTranslation:
 class TestResponseTranslation:
     def test_basic_text_response(self) -> None:
         raw = {
-            "candidates": [{
-                "content": {"parts": [{"text": "Hello!"}], "role": "model"},
-                "finishReason": "STOP",
-            }],
+            "candidates": [
+                {
+                    "content": {"parts": [{"text": "Hello!"}], "role": "model"},
+                    "finishReason": "STOP",
+                }
+            ],
             "usageMetadata": {
                 "promptTokenCount": 5,
                 "candidatesTokenCount": 3,
@@ -175,18 +195,22 @@ class TestResponseTranslation:
 
     def test_function_call_response(self) -> None:
         raw = {
-            "candidates": [{
-                "content": {
-                    "parts": [{
-                        "functionCall": {
-                            "name": "search",
-                            "args": {"query": "cats"},
-                        }
-                    }],
-                    "role": "model",
-                },
-                "finishReason": "STOP",
-            }],
+            "candidates": [
+                {
+                    "content": {
+                        "parts": [
+                            {
+                                "functionCall": {
+                                    "name": "search",
+                                    "args": {"query": "cats"},
+                                }
+                            }
+                        ],
+                        "role": "model",
+                    },
+                    "finishReason": "STOP",
+                }
+            ],
             "usageMetadata": {
                 "promptTokenCount": 10,
                 "candidatesTokenCount": 5,
@@ -202,10 +226,12 @@ class TestResponseTranslation:
 
     def test_safety_finish_reason(self) -> None:
         raw = {
-            "candidates": [{
-                "content": {"parts": [{"text": ""}], "role": "model"},
-                "finishReason": "SAFETY",
-            }],
+            "candidates": [
+                {
+                    "content": {"parts": [{"text": ""}], "role": "model"},
+                    "finishReason": "SAFETY",
+                }
+            ],
             "usageMetadata": {
                 "promptTokenCount": 5,
                 "candidatesTokenCount": 0,
@@ -217,10 +243,12 @@ class TestResponseTranslation:
 
     def test_response_has_openai_format(self) -> None:
         raw = {
-            "candidates": [{
-                "content": {"parts": [{"text": "test"}], "role": "model"},
-                "finishReason": "STOP",
-            }],
+            "candidates": [
+                {
+                    "content": {"parts": [{"text": "test"}], "role": "model"},
+                    "finishReason": "STOP",
+                }
+            ],
             "usageMetadata": {
                 "promptTokenCount": 1,
                 "candidatesTokenCount": 1,

@@ -97,16 +97,20 @@ class AnthropicProvider(LLMProvider):
                 # Tool calls → tool_use content blocks
                 if msg.tool_calls:
                     for tc in msg.tool_calls:
-                        anthropic_content.append({
-                            "type": "tool_use",
-                            "id": tc.id,
-                            "name": tc.function.name,
-                            "input": json.loads(tc.function.arguments),
-                        })
-                messages.append({
-                    "role": "assistant",
-                    "content": anthropic_content or [{"type": "text", "text": ""}],
-                })
+                        anthropic_content.append(
+                            {
+                                "type": "tool_use",
+                                "id": tc.id,
+                                "name": tc.function.name,
+                                "input": json.loads(tc.function.arguments),
+                            }
+                        )
+                messages.append(
+                    {
+                        "role": "assistant",
+                        "content": anthropic_content or [{"type": "text", "text": ""}],
+                    }
+                )
 
             elif role == "tool":
                 # Tool results: merge consecutive tool messages into one user message
@@ -129,10 +133,12 @@ class AnthropicProvider(LLMProvider):
 
             elif role == "user":
                 if isinstance(content, str):
-                    messages.append({
-                        "role": "user",
-                        "content": [{"type": "text", "text": content}],
-                    })
+                    messages.append(
+                        {
+                            "role": "user",
+                            "content": [{"type": "text", "text": content}],
+                        }
+                    )
                 elif isinstance(content, list):
                     parts = []
                     for part in content:
@@ -149,19 +155,23 @@ class AnthropicProvider(LLMProvider):
                                 # Base64 inline image
                                 media_type, _, b64_data = url.partition(";base64,")
                                 media_type = media_type.replace("data:", "")
-                                parts.append({
-                                    "type": "image",
-                                    "source": {
-                                        "type": "base64",
-                                        "media_type": media_type,
-                                        "data": b64_data,
-                                    },
-                                })
+                                parts.append(
+                                    {
+                                        "type": "image",
+                                        "source": {
+                                            "type": "base64",
+                                            "media_type": media_type,
+                                            "data": b64_data,
+                                        },
+                                    }
+                                )
                             else:
-                                parts.append({
-                                    "type": "image",
-                                    "source": {"type": "url", "url": url},
-                                })
+                                parts.append(
+                                    {
+                                        "type": "image",
+                                        "source": {"type": "url", "url": url},
+                                    }
+                                )
                     messages.append({"role": "user", "content": parts})
 
         body: dict[str, Any] = {
@@ -209,14 +219,16 @@ class AnthropicProvider(LLMProvider):
             if block["type"] == "text":
                 text_parts.append(block["text"])
             elif block["type"] == "tool_use":
-                tool_calls.append({
-                    "id": block["id"],
-                    "type": "function",
-                    "function": {
-                        "name": block["name"],
-                        "arguments": json.dumps(block["input"]),
-                    },
-                })
+                tool_calls.append(
+                    {
+                        "id": block["id"],
+                        "type": "function",
+                        "function": {
+                            "name": block["name"],
+                            "arguments": json.dumps(block["input"]),
+                        },
+                    }
+                )
 
         message: dict[str, Any] = {"role": "assistant"}
         if text_parts:
@@ -234,28 +246,25 @@ class AnthropicProvider(LLMProvider):
         usage = {
             "prompt_tokens": usage_raw.get("input_tokens", 0),
             "completion_tokens": usage_raw.get("output_tokens", 0),
-            "total_tokens": usage_raw.get("input_tokens", 0)
-            + usage_raw.get("output_tokens", 0),
+            "total_tokens": usage_raw.get("input_tokens", 0) + usage_raw.get("output_tokens", 0),
         }
 
-        return ChatCompletionResponse.model_validate({
-            "id": f"chatcmpl-{raw.get('id', uuid.uuid4().hex[:12])}",
-            "object": "chat.completion",
-            "created": int(time.time()),
-            "model": raw.get("model", ""),
-            "choices": [
-                {"index": 0, "message": message, "finish_reason": finish_reason}
-            ],
-            "usage": usage,
-        })
+        return ChatCompletionResponse.model_validate(
+            {
+                "id": f"chatcmpl-{raw.get('id', uuid.uuid4().hex[:12])}",
+                "object": "chat.completion",
+                "created": int(time.time()),
+                "model": raw.get("model", ""),
+                "choices": [{"index": 0, "message": message, "finish_reason": finish_reason}],
+                "usage": usage,
+            }
+        )
 
     # ------------------------------------------------------------------
     # Non-streaming
     # ------------------------------------------------------------------
 
-    async def chat_completion(
-        self, request: ChatCompletionRequest
-    ) -> ChatCompletionResponse:
+    async def chat_completion(self, request: ChatCompletionRequest) -> ChatCompletionResponse:
         body = self.translate_request(request)
         body.pop("stream", None)
 
@@ -306,9 +315,7 @@ class AnthropicProvider(LLMProvider):
                     msg = event.get("message", {})
                     model = msg.get("model", model)
                     # Emit role chunk
-                    chunk = _make_chunk(
-                        completion_id, created, model, delta={"role": "assistant"}
-                    )
+                    chunk = _make_chunk(completion_id, created, model, delta={"role": "assistant"})
                     yield f"data: {json.dumps(chunk)}\n\n"
 
                 elif event_type == "content_block_start":
@@ -345,13 +352,7 @@ class AnthropicProvider(LLMProvider):
                         yield f"data: {json.dumps(chunk)}\n\n"
 
                     elif delta_type == "input_json_delta":
-                        tc = {
-                            "function": {
-                                "arguments": delta_data.get(
-                                    "partial_json", ""
-                                )
-                            }
-                        }
+                        tc = {"function": {"arguments": delta_data.get("partial_json", "")}}
                         chunk = _make_chunk(
                             completion_id,
                             created,
@@ -362,9 +363,7 @@ class AnthropicProvider(LLMProvider):
 
                 elif event_type == "message_delta":
                     stop_reason = event.get("delta", {}).get("stop_reason")
-                    finish_reason = _STOP_REASON_MAP.get(
-                        stop_reason or "", "stop"
-                    )
+                    finish_reason = _STOP_REASON_MAP.get(stop_reason or "", "stop")
                     chunk = _make_chunk(
                         completion_id,
                         created,
@@ -400,7 +399,5 @@ def _make_chunk(
         "object": "chat.completion.chunk",
         "created": created,
         "model": model,
-        "choices": [
-            {"index": 0, "delta": delta, "finish_reason": finish_reason}
-        ],
+        "choices": [{"index": 0, "delta": delta, "finish_reason": finish_reason}],
     }

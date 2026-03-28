@@ -25,9 +25,7 @@ class TestNonStreamingProxy:
         assert body["usage"]["total_tokens"] == 19
 
     @respx.mock
-    async def test_response_includes_request_id_header(
-        self, client: httpx.AsyncClient
-    ) -> None:
+    async def test_response_includes_request_id_header(self, client: httpx.AsyncClient) -> None:
         respx.post("https://api.openai.com/v1/chat/completions").mock(
             return_value=httpx.Response(200, json=SAMPLE_OPENAI_RESPONSE)
         )
@@ -86,9 +84,7 @@ class TestNonStreamingProxy:
         assert body["choices"][0]["message"]["tool_calls"][0]["function"]["name"] == "get_weather"
 
     @respx.mock
-    async def test_forwards_unknown_request_fields(
-        self, client: httpx.AsyncClient
-    ) -> None:
+    async def test_forwards_unknown_request_fields(self, client: httpx.AsyncClient) -> None:
         """Extra fields from newer SDKs should be forwarded to the provider."""
         respx.post("https://api.openai.com/v1/chat/completions").mock(
             return_value=httpx.Response(200, json=SAMPLE_OPENAI_RESPONSE)
@@ -113,9 +109,7 @@ class TestErrorHandling:
         assert response.status_code == 500
 
     @respx.mock
-    async def test_upstream_429_returns_rate_limit(
-        self, client: httpx.AsyncClient
-    ) -> None:
+    async def test_upstream_429_returns_rate_limit(self, client: httpx.AsyncClient) -> None:
         respx.post("https://api.openai.com/v1/chat/completions").mock(
             return_value=httpx.Response(429, text="Rate limit exceeded")
         )

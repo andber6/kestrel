@@ -93,9 +93,7 @@ class TestResolveTier:
             instruction_nuance=1,
             error_tolerance=1,
         )
-        tier, reasons = resolve_tier(
-            scores, "gpt-4o", tier_floor=Tier.STANDARD
-        )
+        tier, reasons = resolve_tier(scores, "gpt-4o", tier_floor=Tier.STANDARD)
         assert tier == Tier.STANDARD
         assert any("floor" in r.lower() for r in reasons)
 
@@ -107,9 +105,7 @@ class TestResolveTier:
             instruction_nuance=3,
             error_tolerance=4,
         )
-        tier, reasons = resolve_tier(
-            scores, "gpt-4o", tier_ceiling=Tier.STANDARD
-        )
+        tier, reasons = resolve_tier(scores, "gpt-4o", tier_ceiling=Tier.STANDARD)
         assert tier == Tier.STANDARD
 
 

@@ -10,29 +10,72 @@ from agentrouter.routing.models import RequestFeatures
 # Domain-specific keyword categories that signal higher complexity
 _DOMAIN_KEYWORDS: dict[str, list[str]] = {
     "legal": [
-        "legal", "attorney", "lawyer", "court", "statute", "regulation",
-        "compliance", "liability", "jurisdiction", "tort", "plaintiff",
-        "defendant", "contract law", "intellectual property",
+        "legal",
+        "attorney",
+        "lawyer",
+        "court",
+        "statute",
+        "regulation",
+        "compliance",
+        "liability",
+        "jurisdiction",
+        "tort",
+        "plaintiff",
+        "defendant",
+        "contract law",
+        "intellectual property",
     ],
     "medical": [
-        "medical", "clinical", "diagnosis", "patient", "treatment",
-        "symptom", "prescription", "dosage", "pathology", "prognosis",
-        "contraindication", "adverse effect",
+        "medical",
+        "clinical",
+        "diagnosis",
+        "patient",
+        "treatment",
+        "symptom",
+        "prescription",
+        "dosage",
+        "pathology",
+        "prognosis",
+        "contraindication",
+        "adverse effect",
     ],
     "financial": [
-        "financial", "investment", "portfolio", "hedge", "derivative",
-        "valuation", "securities", "fiduciary", "tax implications",
-        "audit", "revenue recognition", "amortization",
+        "financial",
+        "investment",
+        "portfolio",
+        "hedge",
+        "derivative",
+        "valuation",
+        "securities",
+        "fiduciary",
+        "tax implications",
+        "audit",
+        "revenue recognition",
+        "amortization",
     ],
     "security": [
-        "vulnerability", "exploit", "authentication", "authorization",
-        "encryption", "penetration test", "security audit", "CVE",
-        "zero-day", "privilege escalation",
+        "vulnerability",
+        "exploit",
+        "authentication",
+        "authorization",
+        "encryption",
+        "penetration test",
+        "security audit",
+        "CVE",
+        "zero-day",
+        "privilege escalation",
     ],
     "math": [
-        "theorem", "proof", "integral", "differential equation",
-        "eigenvalue", "topology", "linear algebra", "stochastic",
-        "bayesian", "optimization problem",
+        "theorem",
+        "proof",
+        "integral",
+        "differential equation",
+        "eigenvalue",
+        "topology",
+        "linear algebra",
+        "stochastic",
+        "bayesian",
+        "optimization problem",
     ],
 }
 
@@ -103,10 +146,7 @@ def analyze_request(request: ChatCompletionRequest) -> RequestFeatures:
 
     msg_count = len(messages)
     has_tools = request.tools is not None and len(request.tools) > 0
-    has_json_mode = (
-        request.response_format is not None
-        and request.response_format.type != "text"
-    )
+    has_json_mode = request.response_format is not None and request.response_format.type != "text"
 
     return RequestFeatures(
         total_message_count=msg_count,

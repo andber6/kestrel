@@ -12,17 +12,22 @@ TIER_MODELS: dict[Tier, list[str]] = {
         "claude-haiku-4-5",
         "gemini-1.5-flash",
         "llama-3.1-8b-instant",
+        "command-light",
     ],
     Tier.STANDARD: [
         "gpt-4o-mini",
         "claude-haiku-4-5",
         "gemini-1.5-flash",
+        "mistral-small-latest",
+        "command-r",
         "llama-3.1-70b-versatile",
     ],
     Tier.PREMIUM: [
         "gpt-4o",
         "claude-sonnet-4-6",
         "gemini-1.5-pro",
+        "mistral-large-latest",
+        "command-r-plus",
     ],
 }
 
@@ -76,4 +81,10 @@ def _model_to_provider(model: str) -> str | None:
         return "gemini"
     if model_lower.startswith(("llama", "mixtral", "gemma")):
         return "groq"
+    if model_lower.startswith(("mistral-", "codestral", "pixtral")):
+        return "mistral"
+    if model_lower.startswith("command-"):
+        return "cohere"
+    if "/" in model_lower:  # Together AI uses org/model format
+        return "together"
     return None

@@ -18,14 +18,16 @@ def _make_provider() -> GroqProvider:
 
 class TestGroqTranslation:
     def test_strips_unsupported_fields(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "llama-3.1-8b-instant",
-            "messages": [{"role": "user", "content": "hi"}],
-            "logprobs": True,
-            "top_logprobs": 3,
-            "logit_bias": {"123": 1.0},
-            "temperature": 0.5,
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "llama-3.1-8b-instant",
+                "messages": [{"role": "user", "content": "hi"}],
+                "logprobs": True,
+                "top_logprobs": 3,
+                "logit_bias": {"123": 1.0},
+                "temperature": 0.5,
+            }
+        )
         provider = _make_provider()
         body = provider.translate_request(req)
 
@@ -37,40 +39,46 @@ class TestGroqTranslation:
         assert body["model"] == "llama-3.1-8b-instant"
 
     def test_downgrades_json_schema_to_json_object(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "llama-3.1-8b-instant",
-            "messages": [{"role": "user", "content": "hi"}],
-            "response_format": {
-                "type": "json_schema",
-                "json_schema": {"name": "test", "schema": {"type": "object"}},
-            },
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "llama-3.1-8b-instant",
+                "messages": [{"role": "user", "content": "hi"}],
+                "response_format": {
+                    "type": "json_schema",
+                    "json_schema": {"name": "test", "schema": {"type": "object"}},
+                },
+            }
+        )
         provider = _make_provider()
         body = provider.translate_request(req)
 
         assert body["response_format"] == {"type": "json_object"}
 
     def test_preserves_json_object_format(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "llama-3.1-8b-instant",
-            "messages": [{"role": "user", "content": "hi"}],
-            "response_format": {"type": "json_object"},
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "llama-3.1-8b-instant",
+                "messages": [{"role": "user", "content": "hi"}],
+                "response_format": {"type": "json_object"},
+            }
+        )
         provider = _make_provider()
         body = provider.translate_request(req)
 
         assert body["response_format"] == {"type": "json_object"}
 
     def test_passthrough_for_standard_request(self) -> None:
-        req = ChatCompletionRequest.model_validate({
-            "model": "llama-3.1-70b-versatile",
-            "messages": [
-                {"role": "system", "content": "You are helpful."},
-                {"role": "user", "content": "Hello"},
-            ],
-            "temperature": 0.7,
-            "max_tokens": 500,
-        })
+        req = ChatCompletionRequest.model_validate(
+            {
+                "model": "llama-3.1-70b-versatile",
+                "messages": [
+                    {"role": "system", "content": "You are helpful."},
+                    {"role": "user", "content": "Hello"},
+                ],
+                "temperature": 0.7,
+                "max_tokens": 500,
+            }
+        )
         provider = _make_provider()
         body = provider.translate_request(req)
 

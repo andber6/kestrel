@@ -45,9 +45,7 @@ class TestStreamingProxy:
     @respx.mock
     async def test_streams_chunks_to_client(self, client: httpx.AsyncClient) -> None:
         """Verify that SSE chunks from upstream are forwarded."""
-        sse_body = _make_sse_response(
-            CHUNK_ROLE, CHUNK_CONTENT_1, CHUNK_CONTENT_2, CHUNK_FINISH
-        )
+        sse_body = _make_sse_response(CHUNK_ROLE, CHUNK_CONTENT_1, CHUNK_CONTENT_2, CHUNK_FINISH)
         respx.post("https://api.openai.com/v1/chat/completions").mock(
             return_value=httpx.Response(
                 200,
@@ -64,9 +62,7 @@ class TestStreamingProxy:
 
         # Parse SSE lines
         text = response.text
-        data_lines = [
-            line for line in text.split("\n") if line.startswith("data: ")
-        ]
+        data_lines = [line for line in text.split("\n") if line.startswith("data: ")]
 
         # Should have: role chunk, 2 content chunks, finish chunk, [DONE]
         assert len(data_lines) == 5
@@ -77,9 +73,7 @@ class TestStreamingProxy:
         assert '"content":"!"' in data_lines[2]
 
     @respx.mock
-    async def test_streaming_response_headers(
-        self, client: httpx.AsyncClient
-    ) -> None:
+    async def test_streaming_response_headers(self, client: httpx.AsyncClient) -> None:
         sse_body = _make_sse_response(CHUNK_ROLE, CHUNK_FINISH)
         respx.post("https://api.openai.com/v1/chat/completions").mock(
             return_value=httpx.Response(
@@ -96,9 +90,7 @@ class TestStreamingProxy:
         assert response.headers.get("x-accel-buffering") == "no"
 
     @respx.mock
-    async def test_non_stream_request_returns_json(
-        self, client: httpx.AsyncClient
-    ) -> None:
+    async def test_non_stream_request_returns_json(self, client: httpx.AsyncClient) -> None:
         """When stream is False/None, should return regular JSON."""
         from tests.conftest import SAMPLE_OPENAI_RESPONSE
 

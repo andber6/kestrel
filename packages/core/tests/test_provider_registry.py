@@ -104,9 +104,7 @@ class TestFallback:
         assert "anthropic" in provider_names
 
     def test_fallback_skips_unavailable_providers(self) -> None:
-        registry = _make_registry(
-            openai="sk-test", anthropic="sk-test", gemini="key-test"
-        )
+        registry = _make_registry(openai="sk-test", anthropic="sk-test", gemini="key-test")
         # Mark anthropic unhealthy
         for _ in range(3):
             registry.mark_unhealthy("anthropic")
