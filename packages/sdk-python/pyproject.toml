@@ -1,0 +1,30 @@
+[project]
+name = "agentrouter"
+version = "0.1.0"
+description = "Python SDK for AgentRouter — route LLM requests to the cheapest capable model"
+requires-python = ">=3.9"
+license = "MIT"
+readme = "README.md"
+dependencies = [
+    "openai>=1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/agentrouter/agentrouter"
+Documentation = "https://github.com/agentrouter/agentrouter/tree/main/docs"
+Repository = "https://github.com/agentrouter/agentrouter"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agentrouter"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

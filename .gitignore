@@ -11,8 +11,7 @@ build/
 .venv/
 venv/
 
-# uv
-uv.lock
+# uv (lock files tracked for reproducible builds)
 
 # IDE
 .idea/

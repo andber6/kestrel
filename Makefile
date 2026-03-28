@@ -1,4 +1,4 @@
-.PHONY: install dev lint typecheck test run migrate
+.PHONY: install dev lint typecheck test run migrate sdk-install sdk-test
 
 install:
 	cd packages/core && uv sync
@@ -20,3 +20,9 @@ test:
 
 migrate:
 	cd packages/core && uv run alembic upgrade head
+
+sdk-install:
+	cd packages/sdk-python && uv sync --all-extras
+
+sdk-test:
+	cd packages/sdk-python && uv run pytest -v
