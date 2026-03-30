@@ -5,7 +5,7 @@
 1. Clone the repo and install dependencies:
 
 ```bash
-git clone https://github.com/usekestrel/kestrel.git
+git clone https://github.com/andber6/kestrel.git
 cd kestrel/packages/core
 uv sync --all-extras
 ```

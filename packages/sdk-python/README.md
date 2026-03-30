@@ -46,5 +46,5 @@ response = await client.chat.completions.create(
 
 ## Learn More
 
-- [Kestrel documentation](https://github.com/usekestrel/kestrel)
-- [How routing works](https://github.com/usekestrel/kestrel/blob/main/docs/routing.md)
+- [Kestrel documentation](https://github.com/andber6/kestrel)
+- [How routing works](https://github.com/andber6/kestrel/blob/main/docs/routing.md)

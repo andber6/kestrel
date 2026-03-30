@@ -5,7 +5,7 @@
 The fastest way to get a running proxy.
 
 ```bash
-git clone https://github.com/usekestrel/kestrel.git
+git clone https://github.com/andber6/kestrel.git
 cd kestrel
 
 # Configure
@@ -36,7 +36,7 @@ curl http://localhost:8080/v1/chat/completions \
 ## Option 2: Local Development
 
 ```bash
-git clone https://github.com/usekestrel/kestrel.git
+git clone https://github.com/andber6/kestrel.git
 cd kestrel/packages/core
 
 # Install dependencies

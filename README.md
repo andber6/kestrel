@@ -32,7 +32,7 @@ KS_DEV_MODE=true KS_DEV_OPENAI_API_KEY=sk-... uv run kestrel serve --reload
 ### Docker
 
 ```bash
-git clone https://github.com/usekestrel/kestrel.git
+git clone https://github.com/andber6/kestrel.git
 cd kestrel
 cp .env.example .env
 # Edit .env — add at least one provider API key

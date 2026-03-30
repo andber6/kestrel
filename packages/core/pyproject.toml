@@ -41,9 +41,9 @@ dev = [
 kestrel = "kestrel.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/usekestrel/kestrel"
-Documentation = "https://github.com/usekestrel/kestrel/tree/main/docs"
-Repository = "https://github.com/usekestrel/kestrel"
+Homepage = "https://github.com/andber6/kestrel"
+Documentation = "https://github.com/andber6/kestrel/tree/main/docs"
+Repository = "https://github.com/andber6/kestrel"
 
 [build-system]
 requires = ["hatchling"]
