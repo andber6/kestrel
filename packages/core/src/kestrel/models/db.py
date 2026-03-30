@@ -26,6 +26,9 @@ class ApiKey(Base):
     anthropic_api_key_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
     gemini_api_key_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
     groq_api_key_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    mistral_api_key_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    cohere_api_key_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    together_api_key_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

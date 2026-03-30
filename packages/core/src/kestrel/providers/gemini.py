@@ -111,9 +111,10 @@ class GeminiProvider(LLMProvider):
                 parts.append({"text": content})
             elif isinstance(content, list):
                 for part in content:
-                    part_dict = (
+                    raw = (
                         part.model_dump(exclude_none=True) if hasattr(part, "model_dump") else part
                     )
+                    part_dict = dict(raw)
                     if part_dict.get("type") == "text":
                         parts.append({"text": part_dict["text"]})
                     elif part_dict.get("type") == "image_url":

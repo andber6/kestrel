@@ -142,11 +142,12 @@ class AnthropicProvider(LLMProvider):
                 elif isinstance(content, list):
                     parts = []
                     for part in content:
-                        part_dict = (
+                        raw = (
                             part.model_dump(exclude_none=True)
                             if hasattr(part, "model_dump")
                             else part
                         )
+                        part_dict = dict(raw)
                         if part_dict.get("type") == "text":
                             parts.append({"type": "text", "text": part_dict["text"]})
                         elif part_dict.get("type") == "image_url":

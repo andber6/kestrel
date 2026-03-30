@@ -34,7 +34,7 @@ async def chat_completions(
         )
 
     try:
-        return await proxy.proxy_request(request, auth)  # type: ignore[return-value]
+        return await proxy.proxy_request(request, auth)
     except httpx.HTTPStatusError as exc:
         raise HTTPException(
             status_code=exc.response.status_code,

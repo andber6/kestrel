@@ -5,15 +5,15 @@ Drop-in LLM cost optimization. Route requests to the cheapest capable model with
 ## Install
 
 ```bash
-pip install kestrel
+pip install kestrel-sdk
 ```
 
 ## Usage
 
 ```python
-import kestrel
+import kestrel_sdk
 
-client = kestrel.Client(
+client = kestrel_sdk.Client(
     api_key="ks-your-kestrel-key",
     provider_key="sk-your-openai-key",
     base_url="http://localhost:8080/v1",
@@ -31,9 +31,9 @@ The SDK is a thin wrapper over the [OpenAI Python SDK](https://github.com/openai
 ## Async
 
 ```python
-import kestrel
+import kestrel_sdk
 
-client = kestrel.AsyncClient(
+client = kestrel_sdk.AsyncClient(
     api_key="ks-your-key",
     provider_key="sk-your-openai-key",
 )

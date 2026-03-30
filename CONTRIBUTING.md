@@ -23,7 +23,7 @@ cp ../../.env.example ../../.env
 make test
 ```
 
-All 128+ tests use mocked providers — no real API calls, no database needed.
+All 145 tests use mocked providers — no real API calls, no database needed.
 
 ## Code Style
 

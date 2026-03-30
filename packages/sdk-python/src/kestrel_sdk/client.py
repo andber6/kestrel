@@ -14,9 +14,9 @@ class Client(openai.OpenAI):
 
     Usage::
 
-        import kestrel
+        import kestrel_sdk
 
-        client = kestrel.Client(
+        client = kestrel_sdk.Client(
             api_key="ks-your-kestrel-key",
             provider_key="sk-your-openai-key",
         )
@@ -29,7 +29,7 @@ class Client(openai.OpenAI):
         api_key: Your Kestrel API key (starts with ``ks-``), or a provider
             API key for pass-through mode.
         provider_key: Your LLM provider API key (e.g. OpenAI ``sk-...``).
-            Required when using an Kestrel key.
+            Required when using a Kestrel key.
         base_url: Kestrel proxy URL. Defaults to ``http://localhost:8080/v1``.
         **kwargs: Additional arguments passed to ``openai.OpenAI``.
     """
@@ -66,9 +66,9 @@ class AsyncClient(openai.AsyncOpenAI):
 
     Same interface as :class:`Client` but for async usage::
 
-        import kestrel
+        import kestrel_sdk
 
-        client = kestrel.AsyncClient(
+        client = kestrel_sdk.AsyncClient(
             api_key="ks-your-key",
             provider_key="sk-your-openai-key",
         )

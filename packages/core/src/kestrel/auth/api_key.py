@@ -66,7 +66,7 @@ async def authenticate_request(
 
     Supports two patterns:
     1. X-Kestrel-Key header (Kestrel key) + Authorization header (provider key)
-    2. Authorization: Bearer ar-... (Kestrel key, provider key stored in DB)
+    2. Authorization: Bearer ks-... (Kestrel key, provider key stored in DB)
 
     In dev_mode, authentication is bypassed.
     """

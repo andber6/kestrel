@@ -1,14 +1,14 @@
 """Tests for the Kestrel SDK client."""
 
-from kestrel import AsyncClient, Client, __version__
+from kestrel_sdk import AsyncClient, Client, __version__
 
 
 class TestClient:
-    def test_ar_key_sets_custom_header(self) -> None:
+    def test_ks_key_sets_custom_header(self) -> None:
         client = Client(api_key="ks-test-key", provider_key="sk-provider")
         assert client._custom_headers["X-Kestrel-Key"] == "ks-test-key"
 
-    def test_ar_key_uses_provider_key_as_bearer(self) -> None:
+    def test_ks_key_uses_provider_key_as_bearer(self) -> None:
         client = Client(api_key="ks-test-key", provider_key="sk-provider")
         assert client.api_key == "sk-provider"
 
@@ -42,7 +42,7 @@ class TestClient:
 
 
 class TestAsyncClient:
-    def test_ar_key_sets_custom_header(self) -> None:
+    def test_ks_key_sets_custom_header(self) -> None:
         client = AsyncClient(api_key="ks-test-key", provider_key="sk-provider")
         assert client._custom_headers["X-Kestrel-Key"] == "ks-test-key"
 

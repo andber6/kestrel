@@ -12,8 +12,10 @@ from kestrel.auth.api_key import generate_api_key, hash_api_key, key_prefix
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="kestrel",
-        description="Kestrel — LLM cost optimization proxy",
+        description="Kestrel — Drop-in LLM API proxy that routes to the cheapest capable model",
+        epilog="Documentation: https://github.com/usekestrel/kestrel",
     )
+    parser.add_argument("--version", action="version", version="kestrel 0.1.0")
     sub = parser.add_subparsers(dest="command")
 
     # --- serve ---
@@ -34,11 +36,14 @@ def main() -> None:
     gen_parser.add_argument("--anthropic-key", default=None, help="Store an Anthropic API key")
     gen_parser.add_argument("--gemini-key", default=None, help="Store a Gemini API key")
     gen_parser.add_argument("--groq-key", default=None, help="Store a Groq API key")
+    gen_parser.add_argument("--mistral-key", default=None, help="Store a Mistral API key")
+    gen_parser.add_argument("--cohere-key", default=None, help="Store a Cohere API key")
+    gen_parser.add_argument("--together-key", default=None, help="Store a Together AI API key")
 
     key_sub.add_parser("list", help="List all API keys")
 
     revoke_parser = key_sub.add_parser("revoke", help="Revoke an API key")
-    revoke_parser.add_argument("key_prefix", help="Key prefix to revoke (e.g. ar-xxxxx...)")
+    revoke_parser.add_argument("key_prefix", help="Key prefix to revoke (e.g. ks-xxxxx...)")
 
     # --- migrate ---
     sub.add_parser("migrate", help="Run database migrations")
@@ -79,8 +84,13 @@ async def _cmd_key_generate(args: argparse.Namespace) -> None:
     from kestrel.db.session import create_db_engine
     from kestrel.models.db import ApiKey
 
-    settings = Settings()
-    engine, session_factory = create_db_engine(settings.database_url)
+    try:
+        settings = Settings()
+        engine, session_factory = create_db_engine(settings.database_url)
+    except Exception as e:
+        print(f"Error: Could not connect to database: {e}")
+        print("Set KS_DATABASE_URL or run 'kestrel migrate' first.")
+        sys.exit(1)
 
     raw_key = generate_api_key()
     hashed = hash_api_key(raw_key)
@@ -96,6 +106,9 @@ async def _cmd_key_generate(args: argparse.Namespace) -> None:
             anthropic_api_key_encrypted=args.anthropic_key,
             gemini_api_key_encrypted=args.gemini_key,
             groq_api_key_encrypted=args.groq_key,
+            mistral_api_key_encrypted=args.mistral_key,
+            cohere_api_key_encrypted=args.cohere_key,
+            together_api_key_encrypted=args.together_key,
         )
         session.add(record)
         await session.commit()
@@ -117,8 +130,13 @@ async def _cmd_key_list() -> None:
     from kestrel.db.session import create_db_engine
     from kestrel.models.db import ApiKey
 
-    settings = Settings()
-    engine, session_factory = create_db_engine(settings.database_url)
+    try:
+        settings = Settings()
+        engine, session_factory = create_db_engine(settings.database_url)
+    except Exception as e:
+        print(f"Error: Could not connect to database: {e}")
+        print("Set KS_DATABASE_URL or run 'kestrel migrate' first.")
+        sys.exit(1)
 
     async with session_factory() as session:
         result = await session.execute(select(ApiKey).order_by(ApiKey.created_at.desc()))
@@ -145,8 +163,13 @@ async def _cmd_key_revoke(args: argparse.Namespace) -> None:
     from kestrel.db.session import create_db_engine
     from kestrel.models.db import ApiKey
 
-    settings = Settings()
-    engine, session_factory = create_db_engine(settings.database_url)
+    try:
+        settings = Settings()
+        engine, session_factory = create_db_engine(settings.database_url)
+    except Exception as e:
+        print(f"Error: Could not connect to database: {e}")
+        print("Set KS_DATABASE_URL or run 'kestrel migrate' first.")
+        sys.exit(1)
 
     async with session_factory() as session:
         result = await session.execute(select(ApiKey).where(ApiKey.key_prefix == args.key_prefix))

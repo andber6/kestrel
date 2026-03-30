@@ -1,6 +1,6 @@
 # Providers
 
-Kestrel supports 4 LLM providers with automatic format translation. All requests and responses use the OpenAI Chat Completions format.
+Kestrel supports 7 LLM providers with automatic format translation. All requests and responses use the OpenAI Chat Completions format.
 
 ## Supported Providers
 
@@ -49,6 +49,36 @@ Kestrel supports 4 LLM providers with automatic format translation. All requests
 - **Stripped fields**: `logprobs`, `top_logprobs`, `logit_bias`
 - **Downgraded**: `json_schema` response format → `json_object`
 - **Adapter**: `providers/groq.py` (extends `OpenAICompatibleProvider`)
+
+### Mistral
+
+- **Format**: OpenAI-compatible (minor field stripping)
+- **Auth**: Bearer token
+- **Models**: mistral-large-latest, mistral-small-latest, codestral-latest
+- **Stripped fields**: `logprobs`, `top_logprobs`, `logit_bias`
+- **Adapter**: `providers/mistral.py` (extends `OpenAICompatibleProvider`)
+
+### Cohere
+
+- **Format**: Full translation (OpenAI ↔ Cohere Chat V2 API)
+- **Auth**: Bearer token
+- **Models**: command-r-plus, command-r, command-light
+- **Translation details**:
+  - Messages format translated to Cohere V2 format
+  - Tool calls translated bidirectionally
+  - Streaming: Cohere SSE events translated to OpenAI chunk format
+  - `finish_reason` mapping: `COMPLETE`/`STOP_SEQUENCE`→`stop`, `TOOL_CALL`→`tool_calls`, `MAX_TOKENS`→`length`, `ERROR`→`stop`
+- **Adapter**: `providers/cohere.py`
+
+### Together AI
+
+- **Format**: OpenAI-compatible (minor field stripping)
+- **Auth**: Bearer token
+- **Models**: meta-llama/Llama-3.1-8B-Instruct, meta-llama/Llama-3.1-70B-Instruct, mistralai/Mixtral-8x7B-Instruct-v0.1, Qwen/*
+- **Stripped fields**: `logit_bias`, `top_logprobs`
+- **Downgraded**: `json_schema` response format → `json_object`
+- **Note**: Together AI uses `org/model` naming convention (e.g. `meta-llama/Llama-3.1-8B-Instruct`)
+- **Adapter**: `providers/together.py` (extends `OpenAICompatibleProvider`)
 
 ## Adding a New Provider
 

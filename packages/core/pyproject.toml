@@ -3,6 +3,19 @@ name = "kestrel"
 version = "0.1.0"
 description = "Drop-in LLM API proxy that routes requests to the cheapest capable model"
 requires-python = ">=3.12"
+license = "MIT"
+readme = "../../README.md"
+authors = [{ name = "Kestrel Contributors" }]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: FastAPI",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries",
+    "Typing :: Typed",
+]
 dependencies = [
     "fastapi>=0.115",
     "uvicorn[standard]>=0.32",
@@ -26,6 +39,11 @@ dev = [
 
 [project.scripts]
 kestrel = "kestrel.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/usekestrel/kestrel"
+Documentation = "https://github.com/usekestrel/kestrel/tree/main/docs"
+Repository = "https://github.com/usekestrel/kestrel"
 
 [build-system]
 requires = ["hatchling"]

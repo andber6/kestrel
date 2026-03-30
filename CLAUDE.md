@@ -15,14 +15,14 @@ kestrel/
 │   │   ├── src/kestrel/
 │   │   │   ├── app.py              FastAPI factory, lifespan
 │   │   │   ├── config.py           Settings (KS_ env vars, pydantic-settings)
-│   │   │   ├── providers/          LLM adapters (OpenAI, Anthropic, Gemini, Groq)
+│   │   │   ├── providers/          LLM adapters (OpenAI, Anthropic, Gemini, Groq, Mistral, Cohere, Together)
 │   │   │   ├── routing/            Complexity analysis → scoring → tier → model
 │   │   │   ├── services/           Proxy orchestration, registry, health, logging
 │   │   │   ├── auth/               API key auth (two patterns)
 │   │   │   ├── models/             Pydantic (OpenAI format) + SQLAlchemy (DB)
 │   │   │   ├── routes/             POST /v1/chat/completions
 │   │   │   └── middleware/         Request ID + timing
-│   │   └── tests/              138 tests, all mocked (no real API calls)
+│   │   └── tests/              145 tests, all mocked (no real API calls)
 │   └── sdk-python/             ← Python SDK (thin wrapper over openai package)
 ├── docs/                       ← Markdown documentation
 ├── .github/workflows/ci.yml   ← GitHub Actions (ruff, mypy, pytest)
@@ -39,7 +39,7 @@ make dev          # Start dev server on :8080 with --reload
 make lint         # Ruff check + format check
 make format       # Ruff format + fix
 make typecheck    # Mypy strict mode
-make test         # Pytest with coverage (128 tests)
+make test         # Pytest with coverage (135 tests)
 make sdk-test     # Run SDK tests (10 tests)
 ```
 
