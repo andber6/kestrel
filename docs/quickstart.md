@@ -57,14 +57,14 @@ make dev  # starts on port 8080 with --reload
 ## Option 3: Python SDK
 
 ```bash
-pip install kestrel
+pip install kestrel-sdk
 ```
 
 ```python
-import kestrel
+import kestrel_sdk
 
 # Point at your running Kestrel proxy
-client = kestrel.Client(
+client = kestrel_sdk.Client(
     api_key="ks-your-kestrel-key",
     provider_key="sk-your-openai-key",
     base_url="http://localhost:8080/v1",

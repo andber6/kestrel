@@ -1,5 +1,5 @@
 [project]
-name = "kestrel"
+name = "kestrel-ai"
 version = "0.1.0"
 description = "Drop-in LLM API proxy that routes requests to the cheapest capable model"
 requires-python = ">=3.12"

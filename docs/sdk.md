@@ -5,15 +5,15 @@ The Kestrel Python SDK is a thin wrapper over the [OpenAI Python SDK](https://gi
 ## Installation
 
 ```bash
-pip install kestrel
+pip install kestrel-sdk
 ```
 
 ## Basic Usage
 
 ```python
-import kestrel
+import kestrel_sdk
 
-client = kestrel.Client(
+client = kestrel_sdk.Client(
     api_key="ks-your-kestrel-key",      # Kestrel API key
     provider_key="sk-your-openai-key",       # LLM provider API key
     base_url="http://localhost:8080/v1",     # Kestrel proxy URL
@@ -29,9 +29,9 @@ print(response.choices[0].message.content)
 ## Async Usage
 
 ```python
-import kestrel
+import kestrel_sdk
 
-client = kestrel.AsyncClient(
+client = kestrel_sdk.AsyncClient(
     api_key="ks-your-key",
     provider_key="sk-your-openai-key",
 )
@@ -44,10 +44,10 @@ response = await client.chat.completions.create(
 
 ## Pass-Through Mode
 
-If you don't have an Kestrel API key yet, pass the provider key directly:
+If you don't have a Kestrel API key yet, pass the provider key directly:
 
 ```python
-client = kestrel.Client(
+client = kestrel_sdk.Client(
     api_key="sk-your-openai-key",           # Provider key directly
     base_url="http://localhost:8080/v1",
 )
@@ -105,7 +105,7 @@ llm = ChatOpenAI(
 
 ## API Reference
 
-### `kestrel.Client`
+### `kestrel_sdk.Client`
 
 Subclass of `openai.OpenAI`. All OpenAI client methods are available.
 
@@ -118,6 +118,6 @@ Subclass of `openai.OpenAI`. All OpenAI client methods are available.
 | `base_url` | `str` | Kestrel URL (default: `http://localhost:8080/v1`) |
 | `**kwargs` | | Passed to `openai.OpenAI` |
 
-### `kestrel.AsyncClient`
+### `kestrel_sdk.AsyncClient`
 
 Async version. Subclass of `openai.AsyncOpenAI`. Same parameters as `Client`.
