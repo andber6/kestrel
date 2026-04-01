@@ -56,6 +56,7 @@ class ProxyService:
                 "mistral": self._settings.dev_mistral_api_key,
                 "cohere": self._settings.dev_cohere_api_key,
                 "together": self._settings.dev_together_api_key,
+                "xai": self._settings.dev_xai_api_key,
             }
         else:
             # In production, use all stored provider keys from the DB

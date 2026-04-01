@@ -39,6 +39,7 @@ def main() -> None:
     gen_parser.add_argument("--mistral-key", default=None, help="Store a Mistral API key")
     gen_parser.add_argument("--cohere-key", default=None, help="Store a Cohere API key")
     gen_parser.add_argument("--together-key", default=None, help="Store a Together AI API key")
+    gen_parser.add_argument("--xai-key", default=None, help="Store an xAI API key")
 
     key_sub.add_parser("list", help="List all API keys")
 
@@ -109,6 +110,7 @@ async def _cmd_key_generate(args: argparse.Namespace) -> None:
             mistral_api_key_encrypted=args.mistral_key,
             cohere_api_key_encrypted=args.cohere_key,
             together_api_key_encrypted=args.together_key,
+            xai_api_key_encrypted=args.xai_key,
         )
         session.add(record)
         await session.commit()

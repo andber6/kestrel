@@ -28,6 +28,7 @@ TIER_MODELS: dict[Tier, list[str]] = {
         "gemini-1.5-pro",
         "mistral-large-latest",
         "command-r-plus",
+        "grok-2",
     ],
 }
 
@@ -85,6 +86,8 @@ def _model_to_provider(model: str) -> str | None:
         return "mistral"
     if model_lower.startswith("command-"):
         return "cohere"
+    if model_lower.startswith("grok-"):
+        return "xai"
     if "/" in model_lower:  # Together AI uses org/model format
         return "together"
     return None

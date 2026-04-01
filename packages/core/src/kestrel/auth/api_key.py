@@ -107,6 +107,7 @@ async def authenticate_request(
         "mistral": "mistral_api_key_encrypted",
         "cohere": "cohere_api_key_encrypted",
         "together": "together_api_key_encrypted",
+        "xai": "xai_api_key_encrypted",
     }
     for provider_name, field in _PROVIDER_KEY_FIELDS.items():
         value = getattr(api_key_record, field, None)

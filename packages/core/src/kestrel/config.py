@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     mistral_base_url: str = "https://api.mistral.ai/v1"
     cohere_base_url: str = "https://api.cohere.com/v2"
     together_base_url: str = "https://api.together.xyz/v1"
+    xai_base_url: str = "https://api.x.ai/v1"
 
     # Bypass auth for local development
     dev_mode: bool = False
@@ -29,6 +30,7 @@ class Settings(BaseSettings):
     dev_mistral_api_key: str = ""
     dev_cohere_api_key: str = ""
     dev_together_api_key: str = ""
+    dev_xai_api_key: str = ""
 
     # Health check interval in seconds
     health_check_interval: int = 30

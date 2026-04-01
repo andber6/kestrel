@@ -18,6 +18,7 @@ from kestrel.providers.groq import GroqProvider
 from kestrel.providers.mistral import MistralProvider
 from kestrel.providers.openai import OpenAIProvider
 from kestrel.providers.together import TogetherProvider
+from kestrel.providers.xai import XaiProvider
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +47,8 @@ _MODEL_PROVIDER_MAP: dict[str, str] = {
     "meta-llama/": "together",
     "mistralai/": "together",
     "qwen/": "together",
+    # xAI
+    "grok-": "xai",
 }
 
 # Model equivalence for failover: model → list of fallback models (in priority order)
@@ -68,6 +71,10 @@ MODEL_EQUIVALENTS: dict[str, list[str]] = {
     # Cohere
     "command-r-plus": ["gpt-4o", "claude-sonnet-4-6"],
     "command-r": ["gpt-4o-mini", "claude-haiku-4-5"],
+    # xAI
+    "grok-2": ["gpt-4o", "claude-sonnet-4-6"],
+    "grok-3": ["gpt-4o", "claude-sonnet-4-6"],
+    "grok-3-mini": ["gpt-4o-mini", "claude-haiku-4-5"],
 }
 
 
@@ -166,6 +173,16 @@ class ProviderRegistry:
                 TogetherProvider(
                     api_key=keys["together"],
                     base_url=settings.together_base_url,
+                    http_client=http_client,
+                ),
+            )
+
+        if keys.get("xai"):
+            registry.register(
+                "xai",
+                XaiProvider(
+                    api_key=keys["xai"],
+                    base_url=settings.xai_base_url,
                     http_client=http_client,
                 ),
             )

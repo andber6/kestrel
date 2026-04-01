@@ -29,6 +29,7 @@ class ApiKey(Base):
     mistral_api_key_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
     cohere_api_key_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
     together_api_key_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    xai_api_key_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
