@@ -99,7 +99,7 @@ async def authenticate_request(
 
     # Collect all stored provider keys
     provider_keys: dict[str, str] = {}
-    _PROVIDER_KEY_FIELDS = {
+    provider_key_fields = {
         "openai": "openai_api_key_encrypted",
         "anthropic": "anthropic_api_key_encrypted",
         "gemini": "gemini_api_key_encrypted",
@@ -109,7 +109,7 @@ async def authenticate_request(
         "together": "together_api_key_encrypted",
         "xai": "xai_api_key_encrypted",
     }
-    for provider_name, field in _PROVIDER_KEY_FIELDS.items():
+    for provider_name, field in provider_key_fields.items():
         value = getattr(api_key_record, field, None)
         if value:
             provider_keys[provider_name] = value
