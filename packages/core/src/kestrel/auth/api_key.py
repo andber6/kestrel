@@ -18,6 +18,7 @@ class AuthContext:
 
     api_key_id: str
     provider_api_key: str
+    provider_keys: dict[str, str] | None = None
 
 
 def generate_api_key() -> str:
@@ -96,19 +97,35 @@ async def authenticate_request(
     if api_key_record is None:
         raise AuthError("Invalid API key")
 
+    # Collect all stored provider keys
+    provider_keys: dict[str, str] = {}
+    _PROVIDER_KEY_FIELDS = {
+        "openai": "openai_api_key_encrypted",
+        "anthropic": "anthropic_api_key_encrypted",
+        "gemini": "gemini_api_key_encrypted",
+        "groq": "groq_api_key_encrypted",
+        "mistral": "mistral_api_key_encrypted",
+        "cohere": "cohere_api_key_encrypted",
+        "together": "together_api_key_encrypted",
+    }
+    for provider_name, field in _PROVIDER_KEY_FIELDS.items():
+        value = getattr(api_key_record, field, None)
+        if value:
+            provider_keys[provider_name] = value
+
     if provider_api_key is None:
-        # Look up stored provider key
-        stored_key = api_key_record.openai_api_key_encrypted
-        if not stored_key:
+        # Look up stored provider key (prefer OpenAI for backwards compat)
+        if not provider_keys:
             raise AuthError(
                 "No provider API key found. Pass it via Authorization header "
                 "or configure it in your Kestrel dashboard."
             )
-        provider_api_key = stored_key
+        provider_api_key = next(iter(provider_keys.values()))
 
     return AuthContext(
         api_key_id=str(api_key_record.id),
         provider_api_key=provider_api_key,
+        provider_keys=provider_keys,
     )
 
 

@@ -58,9 +58,11 @@ class ProxyService:
                 "together": self._settings.dev_together_api_key,
             }
         else:
-            # In production, the primary key comes from auth context.
-            # Additional provider keys would come from the operator's stored credentials.
-            keys = {"openai": auth.provider_api_key}
+            # In production, use all stored provider keys from the DB
+            if auth.provider_keys:
+                keys = dict(auth.provider_keys)
+            else:
+                keys = {"openai": auth.provider_api_key}
 
         # Filter out empty keys
         keys = {k: v for k, v in keys.items() if v}
