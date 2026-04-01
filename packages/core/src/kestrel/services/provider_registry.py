@@ -72,9 +72,9 @@ MODEL_EQUIVALENTS: dict[str, list[str]] = {
     "command-r-plus": ["gpt-4o", "claude-sonnet-4-6"],
     "command-r": ["gpt-4o-mini", "claude-haiku-4-5"],
     # xAI
-    "grok-2": ["gpt-4o", "claude-sonnet-4-6"],
     "grok-3": ["gpt-4o", "claude-sonnet-4-6"],
     "grok-3-mini": ["gpt-4o-mini", "claude-haiku-4-5"],
+    "grok-4-0709": ["gpt-4o", "claude-sonnet-4-6"],
 }
 
 

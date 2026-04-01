@@ -40,8 +40,8 @@ _MODEL_TIER_MAP: dict[str, Tier] = {
     "command-light": Tier.ECONOMY,
     # xAI
     "grok-3": Tier.PREMIUM,
-    "grok-2": Tier.PREMIUM,
     "grok-3-mini": Tier.STANDARD,
+    "grok-4-0709": Tier.PREMIUM,
 }
 
 _TIER_RANK = {Tier.ECONOMY: 0, Tier.STANDARD: 1, Tier.PREMIUM: 2}

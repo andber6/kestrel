@@ -28,7 +28,7 @@ TIER_MODELS: dict[Tier, list[str]] = {
         "gemini-1.5-pro",
         "mistral-large-latest",
         "command-r-plus",
-        "grok-2",
+        "grok-3",
     ],
 }
 
