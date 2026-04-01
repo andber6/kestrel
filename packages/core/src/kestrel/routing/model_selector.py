@@ -10,14 +10,14 @@ TIER_MODELS: dict[Tier, list[str]] = {
     Tier.ECONOMY: [
         "gpt-4o-mini",
         "claude-haiku-4-5",
-        "gemini-1.5-flash",
+        "gemini-2.0-flash",
         "llama-3.1-8b-instant",
         "command-light",
     ],
     Tier.STANDARD: [
         "gpt-4o-mini",
         "claude-haiku-4-5",
-        "gemini-1.5-flash",
+        "gemini-2.5-flash",
         "mistral-small-latest",
         "command-r",
         "llama-3.1-70b-versatile",
@@ -25,7 +25,7 @@ TIER_MODELS: dict[Tier, list[str]] = {
     Tier.PREMIUM: [
         "gpt-4o",
         "claude-sonnet-4-6",
-        "gemini-1.5-pro",
+        "gemini-2.5-pro",
         "mistral-large-latest",
         "command-r-plus",
         "grok-3",

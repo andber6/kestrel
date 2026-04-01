@@ -54,14 +54,14 @@ _MODEL_PROVIDER_MAP: dict[str, str] = {
 # Model equivalence for failover: model → list of fallback models (in priority order)
 MODEL_EQUIVALENTS: dict[str, list[str]] = {
     # Premium tier
-    "gpt-4o": ["claude-sonnet-4-6", "gemini-1.5-pro"],
-    "claude-sonnet-4-6": ["gpt-4o", "gemini-1.5-pro"],
+    "gpt-4o": ["claude-sonnet-4-6", "gemini-2.5-pro"],
+    "claude-sonnet-4-6": ["gpt-4o", "gemini-2.5-pro"],
     "claude-opus-4-6": ["gpt-4o", "claude-sonnet-4-6"],
-    "gemini-1.5-pro": ["gpt-4o", "claude-sonnet-4-6"],
+    "gemini-2.5-pro": ["gpt-4o", "claude-sonnet-4-6"],
     # Standard tier
-    "gpt-4o-mini": ["claude-haiku-4-5", "gemini-1.5-flash"],
-    "claude-haiku-4-5": ["gpt-4o-mini", "gemini-1.5-flash"],
-    "gemini-1.5-flash": ["gpt-4o-mini", "claude-haiku-4-5"],
+    "gpt-4o-mini": ["claude-haiku-4-5", "gemini-2.5-flash"],
+    "claude-haiku-4-5": ["gpt-4o-mini", "gemini-2.5-flash"],
+    "gemini-2.5-flash": ["gpt-4o-mini", "claude-haiku-4-5"],
     # Economy tier (Groq)
     "llama-3.1-8b-instant": ["gpt-4o-mini", "gemini-1.5-flash"],
     "llama-3.1-70b-versatile": ["gpt-4o-mini", "claude-haiku-4-5"],

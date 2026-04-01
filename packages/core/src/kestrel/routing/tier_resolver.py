@@ -17,8 +17,9 @@ _MODEL_TIER_MAP: dict[str, Tier] = {
     # Economy
     "gpt-4o-mini": Tier.STANDARD,
     "claude-haiku-4-5": Tier.ECONOMY,
-    "gemini-1.5-flash": Tier.STANDARD,
     "gemini-2.0-flash": Tier.STANDARD,
+    "gemini-2.0-flash-lite": Tier.ECONOMY,
+    "gemini-2.5-flash": Tier.STANDARD,
     "llama-3.1-8b-instant": Tier.ECONOMY,
     "llama-3.1-70b-versatile": Tier.STANDARD,
     "mixtral-8x7b-32768": Tier.STANDARD,
@@ -27,8 +28,7 @@ _MODEL_TIER_MAP: dict[str, Tier] = {
     "gpt-4-turbo": Tier.PREMIUM,
     "claude-sonnet-4-6": Tier.PREMIUM,
     "claude-opus-4-6": Tier.PREMIUM,
-    "gemini-1.5-pro": Tier.PREMIUM,
-    "gemini-2.0-pro": Tier.PREMIUM,
+    "gemini-2.5-pro": Tier.PREMIUM,
     # Mistral
     "mistral-large-latest": Tier.PREMIUM,
     "mistral-medium-latest": Tier.STANDARD,
