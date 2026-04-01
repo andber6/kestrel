@@ -10,7 +10,7 @@ TIER_MODELS: dict[Tier, list[str]] = {
     Tier.ECONOMY: [
         "gpt-4o-mini",
         "claude-haiku-4-5",
-        "gemini-2.0-flash",
+        "gemini-2.5-flash",
         "llama-3.1-8b-instant",
         "command-light",
     ],

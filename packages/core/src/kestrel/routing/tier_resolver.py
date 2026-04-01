@@ -17,9 +17,8 @@ _MODEL_TIER_MAP: dict[str, Tier] = {
     # Economy
     "gpt-4o-mini": Tier.STANDARD,
     "claude-haiku-4-5": Tier.ECONOMY,
-    "gemini-2.0-flash": Tier.STANDARD,
-    "gemini-2.0-flash-lite": Tier.ECONOMY,
     "gemini-2.5-flash": Tier.STANDARD,
+    "gemini-2.5-flash-lite": Tier.ECONOMY,
     "llama-3.1-8b-instant": Tier.ECONOMY,
     "llama-3.1-70b-versatile": Tier.STANDARD,
     "mixtral-8x7b-32768": Tier.STANDARD,
