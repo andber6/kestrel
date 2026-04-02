@@ -51,6 +51,12 @@ class RuleBasedScorer:
         if f.code_block_count >= 2:
             score += 1
 
+        # Analytical keywords suggest complex reasoning
+        if f.analytical_keyword_hits >= 1:
+            score += 1
+        if f.analytical_keyword_hits >= 3:
+            score += 1
+
         return _clamp(score)
 
     def _score_output(self, f: RequestFeatures) -> int:
@@ -73,6 +79,12 @@ class RuleBasedScorer:
 
         # Code in the conversation suggests code output expected
         if f.code_block_count >= 1:
+            score += 1
+
+        # Instruction keywords suggest detailed output expected
+        if f.instruction_keyword_hits >= 1:
+            score += 1
+        if f.instruction_keyword_hits >= 3:
             score += 1
 
         return _clamp(score)
@@ -119,6 +131,12 @@ class RuleBasedScorer:
         if f.has_json_mode and f.has_tools:
             score += 1
 
+        # Multiple questions suggest multi-part instructions
+        if f.question_count >= 2:
+            score += 1
+        if f.question_count >= 4:
+            score += 1
+
         return _clamp(score)
 
     def _score_error_tolerance(self, f: RequestFeatures) -> int:
@@ -139,12 +157,18 @@ class RuleBasedScorer:
         if f.code_block_count >= 1:
             score += 1
 
+        # Technical content needs accuracy
+        if f.technical_keyword_hits >= 2:
+            score += 1
+
         # Very short, simple prompts are low-stakes
         if (
             f.last_user_message_chars < 100
             and f.system_prompt_chars < 100
             and not f.has_tools
             and f.domain_keyword_hits == 0
+            and f.technical_keyword_hits == 0
+            and f.analytical_keyword_hits == 0
         ):
             score = 1
 

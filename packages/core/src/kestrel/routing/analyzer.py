@@ -81,6 +81,32 @@ _DOMAIN_KEYWORDS: dict[str, list[str]] = {
 
 _CODE_BLOCK_PATTERN = re.compile(r"```[\s\S]*?```")
 
+# Text-level complexity keywords
+_ANALYTICAL_KEYWORDS = [
+    "compare", "contrast", "analyze", "evaluate", "trade-off", "trade off",
+    "pros and cons", "advantages", "disadvantages", "implications",
+    "critical analysis", "assess", "differentiate", "synthesize",
+    "argue for", "argue against", "debate", "critique", "justify",
+]
+
+_TECHNICAL_KEYWORDS = [
+    "implement", "algorithm", "architecture", "design pattern", "data structure",
+    "distributed", "concurrent", "microservice", "database schema", "api design",
+    "optimization", "complexity", "scalab", "deploy", "infrastructure",
+    "refactor", "debug", "performance", "latency", "throughput",
+    "kubernetes", "docker", "ci/cd", "pipeline", "migration",
+    "machine learning", "neural network", "embedding", "vector",
+    "consensus", "replication", "sharding", "caching strategy",
+]
+
+_INSTRUCTION_KEYWORDS = [
+    "step by step", "step-by-step", "detailed", "comprehensive",
+    "thorough", "in-depth", "exhaustive", "complete guide",
+    "with examples", "with code", "include code", "provide code",
+    "explain in detail", "walk me through", "break down",
+    "production-ready", "best practices", "edge cases",
+]
+
 
 def analyze_request(request: ChatCompletionRequest) -> RequestFeatures:
     """Extract structural features from a request for scoring."""
@@ -148,6 +174,28 @@ def analyze_request(request: ChatCompletionRequest) -> RequestFeatures:
     has_tools = request.tools is not None and len(request.tools) > 0
     has_json_mode = request.response_format is not None and request.response_format.type != "text"
 
+    # Text-level complexity analysis on the last user message
+    last_user_text = ""
+    for msg in reversed(messages):
+        if msg.role == "user":
+            if isinstance(msg.content, str):
+                last_user_text = msg.content
+            elif isinstance(msg.content, list):
+                last_user_text = " ".join(
+                    getattr(p, "text", "") for p in msg.content
+                )
+            break
+
+    last_user_lower = last_user_text.lower()
+
+    analytical_hits = sum(1 for kw in _ANALYTICAL_KEYWORDS if kw in last_user_lower)
+    technical_hits = sum(1 for kw in _TECHNICAL_KEYWORDS if kw in last_user_lower)
+    instruction_hits = sum(1 for kw in _INSTRUCTION_KEYWORDS if kw in last_user_lower)
+    question_count = last_user_text.count("?")
+
+    words = last_user_text.split()
+    avg_word_len = sum(len(w) for w in words) / len(words) if words else 0.0
+
     return RequestFeatures(
         total_message_count=msg_count,
         user_message_count=user_count,
@@ -163,4 +211,9 @@ def analyze_request(request: ChatCompletionRequest) -> RequestFeatures:
         code_block_count=code_blocks,
         domain_keyword_hits=domain_hits,
         domain_categories=domain_cats,
+        analytical_keyword_hits=analytical_hits,
+        technical_keyword_hits=technical_hits,
+        avg_word_length=avg_word_len,
+        question_count=question_count,
+        instruction_keyword_hits=instruction_hits,
     )

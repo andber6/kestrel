@@ -39,6 +39,13 @@ class RequestFeatures:
     domain_keyword_hits: int = 0
     domain_categories: list[str] = field(default_factory=list)
 
+    # Text-level complexity signals
+    analytical_keyword_hits: int = 0  # compare, analyze, evaluate, trade-offs...
+    technical_keyword_hits: int = 0  # implement, algorithm, architecture, debug...
+    avg_word_length: float = 0.0  # vocabulary sophistication proxy
+    question_count: int = 0  # number of question marks in last user message
+    instruction_keyword_hits: int = 0  # step-by-step, detailed, comprehensive...
+
 
 @dataclass(frozen=True)
 class RoutingScores:
