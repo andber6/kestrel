@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     together_base_url: str = "https://api.together.xyz/v1"
     xai_base_url: str = "https://api.x.ai/v1"
 
+    # Encryption key for provider API keys at rest (Fernet, base64-encoded)
+    encryption_key: str = ""
+
     # Bypass auth for local development
     dev_mode: bool = False
 

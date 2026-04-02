@@ -97,20 +97,25 @@ async def _cmd_key_generate(args: argparse.Namespace) -> None:
     hashed = hash_api_key(raw_key)
     prefix = key_prefix(raw_key)
 
+    from kestrel.auth.encryption import encrypt_value
+
+    def _enc(val: str | None) -> str | None:
+        return encrypt_value(val) if val else None
+
     async with session_factory() as session:
         record = ApiKey(
             key_hash=hashed,
             key_prefix=prefix,
             name=args.name,
             is_active=True,
-            openai_api_key_encrypted=args.openai_key,
-            anthropic_api_key_encrypted=args.anthropic_key,
-            gemini_api_key_encrypted=args.gemini_key,
-            groq_api_key_encrypted=args.groq_key,
-            mistral_api_key_encrypted=args.mistral_key,
-            cohere_api_key_encrypted=args.cohere_key,
-            together_api_key_encrypted=args.together_key,
-            xai_api_key_encrypted=args.xai_key,
+            openai_api_key_encrypted=_enc(args.openai_key),
+            anthropic_api_key_encrypted=_enc(args.anthropic_key),
+            gemini_api_key_encrypted=_enc(args.gemini_key),
+            groq_api_key_encrypted=_enc(args.groq_key),
+            mistral_api_key_encrypted=_enc(args.mistral_key),
+            cohere_api_key_encrypted=_enc(args.cohere_key),
+            together_api_key_encrypted=_enc(args.together_key),
+            xai_api_key_encrypted=_enc(args.xai_key),
         )
         session.add(record)
         await session.commit()

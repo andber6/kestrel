@@ -109,10 +109,12 @@ async def authenticate_request(
         "together": "together_api_key_encrypted",
         "xai": "xai_api_key_encrypted",
     }
+    from kestrel.auth.encryption import decrypt_value
+
     for provider_name, field in provider_key_fields.items():
         value = getattr(api_key_record, field, None)
         if value:
-            provider_keys[provider_name] = value
+            provider_keys[provider_name] = decrypt_value(value)
 
     if provider_api_key is None:
         # Look up stored provider key (prefer OpenAI for backwards compat)
