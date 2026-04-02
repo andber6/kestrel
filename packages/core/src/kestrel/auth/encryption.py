@@ -10,14 +10,15 @@ from __future__ import annotations
 
 import logging
 import os
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
-_fernet = None
+_fernet: Any = None
 _initialized = False
 
 
-def _get_fernet():  # type: ignore[no-untyped-def]
+def _get_fernet() -> Any:
     """Lazily initialize Fernet with the encryption key."""
     global _fernet, _initialized
     if _initialized:
@@ -47,7 +48,8 @@ def encrypt_value(plaintext: str) -> str:
     f = _get_fernet()
     if f is None:
         return plaintext
-    return f.encrypt(plaintext.encode()).decode()
+    encrypted: str = f.encrypt(plaintext.encode()).decode()
+    return encrypted
 
 
 def decrypt_value(stored: str) -> str:
@@ -58,7 +60,8 @@ def decrypt_value(stored: str) -> str:
     if f is None:
         return stored
     try:
-        return f.decrypt(stored.encode()).decode()
+        decrypted: str = f.decrypt(stored.encode()).decode()
+        return decrypted
     except Exception:
         # Value is likely legacy plaintext (not encrypted)
         return stored
