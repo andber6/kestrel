@@ -26,9 +26,7 @@ def _get_fernet():  # type: ignore[no-untyped-def]
     _initialized = True
     key = os.environ.get("KS_ENCRYPTION_KEY", "")
     if not key:
-        logger.warning(
-            "KS_ENCRYPTION_KEY not set — provider keys stored as plaintext"
-        )
+        logger.warning("KS_ENCRYPTION_KEY not set — provider keys stored as plaintext")
         return None
 
     try:
