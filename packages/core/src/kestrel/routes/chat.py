@@ -36,12 +36,31 @@ async def chat_completions(
     try:
         return await proxy.proxy_request(request, auth)
     except httpx.HTTPStatusError as exc:
-        raise HTTPException(
-            status_code=exc.response.status_code,
-            detail=exc.response.text,
-        ) from exc
+        status = exc.response.status_code
+        detail = exc.response.text
+        if status == 401:
+            detail = (
+                "Provider rejected the API key. Check that your provider"
+                " credentials are correct and active in your Kestrel dashboard."
+            )
+        elif status == 429:
+            detail = (
+                "Provider rate limit exceeded. Try again shortly or check"
+                " your provider's usage limits."
+            )
+        elif status == 404:
+            detail = (
+                f"Model not available from provider. The requested model"
+                f" may not exist or may have been deprecated."
+            )
+        raise HTTPException(status_code=status, detail=detail) from exc
     except httpx.TimeoutException as exc:
         raise HTTPException(
             status_code=504,
-            detail="Upstream provider timed out",
+            detail="Upstream provider timed out. Try again shortly.",
+        ) from exc
+    except httpx.ConnectError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail="Could not connect to upstream provider.",
         ) from exc
