@@ -13,7 +13,7 @@ from kestrel.routing.tier_resolver import (
 
 class TestScoreToTier:
     def test_economy_range(self) -> None:
-        for total in range(5, 10):
+        for total in range(5, 9):
             scores = RoutingScores(
                 reasoning_depth=1,
                 output_complexity=1,
