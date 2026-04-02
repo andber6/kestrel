@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from kestrel.routing.models import RoutingScores, Tier
 
-# Score range → tier mapping (from the master plan)
+# Score range → tier mapping
 _TIER_THRESHOLDS: list[tuple[int, int, Tier]] = [
-    (5, 9, Tier.ECONOMY),
-    (10, 16, Tier.STANDARD),
-    (17, 25, Tier.PREMIUM),
+    (5, 8, Tier.ECONOMY),
+    (9, 14, Tier.STANDARD),
+    (15, 25, Tier.PREMIUM),
 ]
 
 # Model → tier ceiling mapping. The requested model determines the max tier.

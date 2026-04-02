@@ -57,6 +57,10 @@ class RuleBasedScorer:
         if f.analytical_keyword_hits >= 3:
             score += 1
 
+        # Technical keywords compound with analytical
+        if f.technical_keyword_hits >= 3:
+            score += 1
+
         return _clamp(score)
 
     def _score_output(self, f: RequestFeatures) -> int:
@@ -107,6 +111,12 @@ class RuleBasedScorer:
         if f.has_images:
             score += 1
 
+        # Heavy technical keywords suggest specialized knowledge
+        if f.technical_keyword_hits >= 2:
+            score += 1
+        if f.technical_keyword_hits >= 5:
+            score += 1
+
         return _clamp(score)
 
     def _score_nuance(self, f: RequestFeatures) -> int:
@@ -135,6 +145,12 @@ class RuleBasedScorer:
         if f.question_count >= 2:
             score += 1
         if f.question_count >= 4:
+            score += 1
+
+        # Instruction keywords signal precise output needed
+        if f.instruction_keyword_hits >= 2:
+            score += 1
+        if f.instruction_keyword_hits >= 4:
             score += 1
 
         return _clamp(score)
