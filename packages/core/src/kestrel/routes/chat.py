@@ -50,8 +50,8 @@ async def chat_completions(
             )
         elif status == 404:
             detail = (
-                f"Model not available from provider. The requested model"
-                f" may not exist or may have been deprecated."
+                "Model not available from provider. The requested model"
+                " may not exist or may have been deprecated."
             )
         raise HTTPException(status_code=status, detail=detail) from exc
     except httpx.TimeoutException as exc:
