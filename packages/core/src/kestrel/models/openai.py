@@ -70,11 +70,11 @@ class ResponseFormat(BaseModel):
 class ChatCompletionRequest(BaseModel):
     """OpenAI-compatible chat completion request."""
 
-    model: str
-    messages: list[ChatMessage]
+    model: str = Field(max_length=256)
+    messages: list[ChatMessage] = Field(max_length=1024)
     temperature: float | None = None
     top_p: float | None = None
-    n: int | None = None
+    n: int | None = Field(default=None, le=8)
     stream: bool | None = None
     stream_options: dict[str, Any] | None = None
     stop: str | list[str] | None = None
@@ -84,9 +84,9 @@ class ChatCompletionRequest(BaseModel):
     frequency_penalty: float | None = None
     logit_bias: dict[str, float] | None = None
     logprobs: bool | None = None
-    top_logprobs: int | None = None
-    user: str | None = None
-    tools: list[ToolDefinition] | None = None
+    top_logprobs: int | None = Field(default=None, le=20)
+    user: str | None = Field(default=None, max_length=256)
+    tools: list[ToolDefinition] | None = Field(default=None, max_length=128)
     tool_choice: str | dict[str, Any] | None = None
     response_format: ResponseFormat | None = None
     seed: int | None = None

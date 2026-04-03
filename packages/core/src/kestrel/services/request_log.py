@@ -63,8 +63,8 @@ class RequestLogService:
                 )
                 session.add(entry)
                 await session.commit()
-        except Exception:
-            logger.exception("Failed to write request log")
+        except Exception as exc:
+            logger.warning("Failed to write request log: %s", exc)
 
 
 def _strip_base64(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:

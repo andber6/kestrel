@@ -1,4 +1,4 @@
-"""Request ID and timing middleware."""
+"""Request ID, timing, and security headers middleware."""
 
 from __future__ import annotations
 
@@ -23,4 +23,18 @@ class RequestIdMiddleware(BaseHTTPMiddleware):
         elapsed_ms = int((time.monotonic() - start) * 1000)
         response.headers["X-Request-Id"] = request_id
         response.headers["X-Response-Time-Ms"] = str(elapsed_ms)
+        return response
+
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    """Adds standard security headers to every response."""
+
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        # Only set Cache-Control if not already set by the route handler
+        if "Cache-Control" not in response.headers:
+            response.headers["Cache-Control"] = "no-store"
         return response

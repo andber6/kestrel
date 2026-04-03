@@ -3,40 +3,64 @@
 Uses Fernet (AES-128-CBC with HMAC-SHA256) from the cryptography library.
 The encryption key is loaded from the KS_ENCRYPTION_KEY environment variable.
 When no key is configured, values are stored and returned as plaintext
-for backwards compatibility during development.
+for backwards compatibility during development. An invalid key raises
+ValueError at initialization to prevent silent plaintext fallback.
 """
 
 from __future__ import annotations
 
 import logging
 import os
-from typing import Any
+import threading
 
 logger = logging.getLogger(__name__)
 
-_fernet: Any = None
+try:
+    from cryptography.fernet import Fernet, InvalidToken
+except ImportError:  # pragma: no cover
+    Fernet = None  # type: ignore[assignment,misc]
+    InvalidToken = Exception  # type: ignore[assignment,misc]
+
+_fernet: Fernet | None = None
 _initialized = False
+_lock = threading.Lock()
 
 
-def _get_fernet() -> Any:
-    """Lazily initialize Fernet with the encryption key."""
+def _get_fernet() -> Fernet | None:
+    """Lazily initialize Fernet with the encryption key (thread-safe)."""
     global _fernet, _initialized
     if _initialized:
         return _fernet
 
-    _initialized = True
-    key = os.environ.get("KS_ENCRYPTION_KEY", "")
-    if not key:
-        logger.warning("KS_ENCRYPTION_KEY not set — provider keys stored as plaintext")
-        return None
+    with _lock:
+        if _initialized:
+            return _fernet
 
-    try:
-        from cryptography.fernet import Fernet
+        key = os.environ.get("KS_ENCRYPTION_KEY", "")
+        if not key:
+            logger.warning("KS_ENCRYPTION_KEY not set — provider keys stored as plaintext")
+            _initialized = True
+            return None
 
-        _fernet = Fernet(key.encode())
-        logger.info("Provider key encryption enabled")
-    except Exception:
-        logger.exception("Invalid KS_ENCRYPTION_KEY — falling back to plaintext")
+        if Fernet is None:
+            logger.error(
+                "cryptography package not installed — cannot encrypt provider keys. "
+                "Install with: uv add cryptography"
+            )
+            _initialized = True
+            return None
+
+        try:
+            _fernet = Fernet(key.encode())
+            _initialized = True
+            logger.info("Provider key encryption enabled")
+        except ValueError as exc:
+            raise ValueError(
+                "Invalid KS_ENCRYPTION_KEY — must be a valid 32-byte "
+                "URL-safe base64-encoded Fernet key. Generate one with: "
+                "python -c 'from cryptography.fernet import Fernet; "
+                "print(Fernet.generate_key().decode())'"
+            ) from exc
 
     return _fernet
 
@@ -62,6 +86,7 @@ def decrypt_value(stored: str) -> str:
     try:
         decrypted: str = f.decrypt(stored.encode()).decode()
         return decrypted
-    except Exception:
+    except InvalidToken:
         # Value is likely legacy plaintext (not encrypted)
+        logger.debug("Could not decrypt value — treating as legacy plaintext")
         return stored
