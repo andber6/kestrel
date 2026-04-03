@@ -3,7 +3,8 @@
 Uses Fernet (AES-128-CBC with HMAC-SHA256) from the cryptography library.
 The encryption key is loaded from the KS_ENCRYPTION_KEY environment variable.
 When no key is configured, values are stored and returned as plaintext
-for backwards compatibility during development.
+for backwards compatibility during development. An invalid key raises
+ValueError at initialization to prevent silent plaintext fallback.
 """
 
 from __future__ import annotations
@@ -35,23 +36,25 @@ def _get_fernet() -> Fernet | None:
         if _initialized:
             return _fernet
 
-        _initialized = True
         key = os.environ.get("KS_ENCRYPTION_KEY", "")
         if not key:
             logger.warning("KS_ENCRYPTION_KEY not set — provider keys stored as plaintext")
+            _initialized = True
             return None
 
         if Fernet is None:
             logger.error(
                 "cryptography package not installed — cannot encrypt provider keys. "
-                "Install with: pip install cryptography"
+                "Install with: uv add cryptography"
             )
+            _initialized = True
             return None
 
         try:
             _fernet = Fernet(key.encode())
+            _initialized = True
             logger.info("Provider key encryption enabled")
-        except (ValueError, Exception) as exc:
+        except ValueError as exc:
             raise ValueError(
                 "Invalid KS_ENCRYPTION_KEY — must be a valid 32-byte "
                 "URL-safe base64-encoded Fernet key. Generate one with: "
