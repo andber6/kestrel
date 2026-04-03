@@ -81,17 +81,9 @@ class ProxyService:
         if not self._settings.routing_enabled:
             return None
 
-        # Parse operator config
-        allowed = (
-            set(self._settings.routing_allowed_providers.split(","))
-            if self._settings.routing_allowed_providers
-            else None
-        )
-        denied = (
-            set(self._settings.routing_denied_providers.split(","))
-            if self._settings.routing_denied_providers
-            else None
-        )
+        # Use cached parsed sets from settings
+        allowed = self._settings.allowed_providers_set
+        denied = self._settings.denied_providers_set
         floor = (
             Tier(self._settings.routing_tier_floor) if self._settings.routing_tier_floor else None
         )
@@ -241,8 +233,8 @@ class ProxyService:
                         try:
                             chunk = ChatCompletionChunk.model_validate_json(data_str[6:])
                             chunks.append(chunk)
-                        except Exception:
-                            pass
+                        except (ValueError, KeyError) as exc:
+                            logger.debug("Failed to parse streaming chunk: %s", exc)
 
                     yield line
 
@@ -339,7 +331,7 @@ class ProxyService:
             request.response_format is not None and request.response_format.type != "text"
         )
 
-        asyncio.create_task(
+        task = asyncio.create_task(
             self._log_service.log(
                 api_key_id=auth.api_key_id,
                 model_requested=request.model,
@@ -359,6 +351,16 @@ class ProxyService:
                 status_code=status_code,
             )
         )
+        task.add_done_callback(_log_task_error)
+
+
+def _log_task_error(task: asyncio.Task[None]) -> None:
+    """Callback to surface exceptions from fire-and-forget log tasks."""
+    if task.cancelled():
+        return
+    exc = task.exception()
+    if exc is not None:
+        logger.error("Background log task failed: %s", exc)
 
 
 def _elapsed_ms(start: float) -> int:

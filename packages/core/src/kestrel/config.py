@@ -1,5 +1,9 @@
 """Application settings loaded from environment variables."""
 
+from __future__ import annotations
+
+from functools import cached_property
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -44,3 +48,17 @@ class Settings(BaseSettings):
     routing_denied_providers: str = ""  # Comma-separated
     routing_tier_floor: str = ""  # Minimum tier: "economy", "standard", "premium"
     routing_tier_ceiling: str = ""  # Maximum tier (overrides model ceiling if lower)
+
+    @cached_property
+    def allowed_providers_set(self) -> set[str] | None:
+        """Parse allowed providers once and cache."""
+        if not self.routing_allowed_providers:
+            return None
+        return {p.strip() for p in self.routing_allowed_providers.split(",") if p.strip()}
+
+    @cached_property
+    def denied_providers_set(self) -> set[str] | None:
+        """Parse denied providers once and cache."""
+        if not self.routing_denied_providers:
+            return None
+        return {p.strip() for p in self.routing_denied_providers.split(",") if p.strip()}

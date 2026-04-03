@@ -63,7 +63,7 @@ MODEL_EQUIVALENTS: dict[str, list[str]] = {
     "claude-haiku-4-5": ["gpt-4o-mini", "gemini-2.5-flash"],
     "gemini-2.5-flash": ["gpt-4o-mini", "claude-haiku-4-5"],
     # Economy tier (Groq)
-    "llama-3.1-8b-instant": ["gpt-4o-mini", "gemini-1.5-flash"],
+    "llama-3.1-8b-instant": ["gpt-4o-mini", "gemini-2.5-flash-lite"],
     "llama-3.1-70b-versatile": ["gpt-4o-mini", "claude-haiku-4-5"],
     # Mistral
     "mistral-large-latest": ["gpt-4o", "claude-sonnet-4-6"],

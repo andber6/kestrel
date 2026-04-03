@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from kestrel.routing.models import RoutingScores, Tier
 
-# Score range → tier mapping
+# Score range → tier mapping (scores are 5-25 from the scorer, but we handle
+# out-of-range values defensively: <5 → ECONOMY, >25 → PREMIUM)
 _TIER_THRESHOLDS: list[tuple[int, int, Tier]] = [
-    (5, 8, Tier.ECONOMY),
+    (0, 8, Tier.ECONOMY),
     (9, 14, Tier.STANDARD),
     (15, 25, Tier.PREMIUM),
 ]

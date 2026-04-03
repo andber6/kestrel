@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from kestrel.models.db import RequestLog
@@ -63,8 +64,8 @@ class RequestLogService:
                 )
                 session.add(entry)
                 await session.commit()
-        except Exception:
-            logger.exception("Failed to write request log")
+        except (SQLAlchemyError, OSError) as exc:
+            logger.warning("Failed to write request log: %s", exc)
 
 
 def _strip_base64(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:

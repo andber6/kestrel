@@ -13,7 +13,7 @@ from fastapi.responses import JSONResponse
 from kestrel.auth.api_key import AuthError
 from kestrel.config import Settings
 from kestrel.db.session import create_db_engine
-from kestrel.middleware.logging import RequestIdMiddleware
+from kestrel.middleware.logging import RequestIdMiddleware, SecurityHeadersMiddleware
 from kestrel.routes.chat import router as chat_router
 from kestrel.services.proxy import ProxyService
 from kestrel.services.request_log import RequestLogService
@@ -67,8 +67,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.settings = settings
 
-    # Middleware
+    # Middleware (outermost runs first)
     app.add_middleware(RequestIdMiddleware)
+    app.add_middleware(SecurityHeadersMiddleware)
 
     # Exception handler for auth errors
     @app.exception_handler(AuthError)

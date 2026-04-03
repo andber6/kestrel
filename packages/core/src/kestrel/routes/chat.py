@@ -37,7 +37,6 @@ async def chat_completions(
         return await proxy.proxy_request(request, auth)
     except httpx.HTTPStatusError as exc:
         status = exc.response.status_code
-        detail = exc.response.text
         if status == 401:
             detail = (
                 "Provider rejected the API key. Check that your provider"
@@ -53,6 +52,13 @@ async def chat_completions(
                 "Model not available from provider. The requested model"
                 " may not exist or may have been deprecated."
             )
+        elif status >= 500:
+            # Don't leak upstream provider error details to clients
+            logger.error("Upstream provider returned %s: %s", status, exc.response.text[:500])
+            detail = "Upstream provider error. Please try again shortly."
+        else:
+            # For other 4xx errors, provide a generic message
+            detail = f"Provider returned error {status}."
         raise HTTPException(status_code=status, detail=detail) from exc
     except httpx.TimeoutException as exc:
         raise HTTPException(
