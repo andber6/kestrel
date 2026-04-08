@@ -59,6 +59,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         "gemini": settings.gemini_base_url,
         "groq": settings.groq_base_url,
         "mistral": settings.mistral_base_url,
+        "cohere": settings.cohere_base_url,
+        "together": settings.together_base_url,
+        "xai": settings.xai_base_url,
     }
     health_check = HealthCheckService(
         registry=health_registry,

@@ -156,6 +156,20 @@ The composite score (5-25) maps to a tier:
 
 **The model you specify is the ceiling.** If you send `model=gpt-4o` (Premium), a simple prompt may route to `gpt-4o-mini` (Economy). If you send `model=gpt-4o-mini` (Standard), the request will never route to a more expensive model.
 
+## Reliability
+
+- **Failover with backoff** — If a provider returns 429/5xx or times out, Kestrel retries with a fallback provider using exponential backoff with jitter (up to 2 retries)
+- **Cross-provider fallback** — `gpt-4o` can fall back to `claude-sonnet-4-6` or `gemini-2.5-pro` if OpenAI is down
+- **Health monitoring** — Background health checks ping all 8 providers every 30 seconds. Unhealthy providers are skipped during routing
+- **Non-blocking logging** — Request logs are written asynchronously. A database outage never blocks API requests
+
+### Health endpoints
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /health` | Liveness probe — always returns `{"status": "ok"}` |
+| `GET /ready` | Readiness probe — checks database connectivity, reports provider health. Returns 503 if DB is unreachable |
+
 ## CLI
 
 ```bash
@@ -169,6 +183,8 @@ kestrel key generate --name "multi" \
 kestrel key list                        # List all API keys
 kestrel key revoke ks-xxxxx...          # Revoke a key
 kestrel migrate                         # Run database migrations
+kestrel logs prune --older-than 30d     # Delete old request logs
+kestrel logs prune --older-than 7d --dry-run  # Preview deletion count
 kestrel --version                       # Show version
 ```
 
@@ -246,7 +262,7 @@ uv run mypy src/        # Type check (strict)
 uv run pytest -v        # Test with coverage
 ```
 
-135 tests, all mocked — no real API calls.
+167 tests, all mocked — no real API calls.
 
 ## Contributing
 

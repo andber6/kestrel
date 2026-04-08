@@ -22,7 +22,7 @@ kestrel/
 │   │   │   ├── models/             Pydantic (OpenAI format) + SQLAlchemy (DB)
 │   │   │   ├── routes/             POST /v1/chat/completions
 │   │   │   └── middleware/         Request ID + timing
-│   │   └── tests/              145 tests, all mocked (no real API calls)
+│   │   └── tests/              167 tests, all mocked (no real API calls)
 │   └── sdk-python/             ← Python SDK (thin wrapper over openai package)
 ├── docs/                       ← Markdown documentation
 ├── .github/workflows/ci.yml   ← GitHub Actions (ruff, mypy, pytest)
@@ -39,7 +39,7 @@ make dev          # Start dev server on :8080 with --reload
 make lint         # Ruff check + format check
 make format       # Ruff format + fix
 make typecheck    # Mypy strict mode
-make test         # Pytest with coverage (135 tests)
+make test         # Pytest with coverage (167 tests)
 make sdk-test     # Run SDK tests (10 tests)
 ```
 

@@ -16,9 +16,13 @@ logger = logging.getLogger(__name__)
 # Lightweight endpoints to ping per provider (no tokens consumed)
 _HEALTH_ENDPOINTS: dict[str, dict[str, str]] = {
     "openai": {"method": "GET", "path": "/models"},
-    "groq": {"method": "GET", "path": "/models"},
     "anthropic": {"method": "GET", "path": "/messages"},  # Returns 405, confirms API is up
     "gemini": {"method": "GET", "path": "/models"},
+    "groq": {"method": "GET", "path": "/models"},
+    "mistral": {"method": "GET", "path": "/models"},
+    "cohere": {"method": "GET", "path": "/models"},
+    "together": {"method": "GET", "path": "/models"},
+    "xai": {"method": "GET", "path": "/models"},
 }
 
 
