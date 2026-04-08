@@ -38,7 +38,16 @@ def _get_fernet() -> Fernet | None:
 
         key = os.environ.get("KS_ENCRYPTION_KEY", "")
         if not key:
-            logger.warning("KS_ENCRYPTION_KEY not set — provider keys stored as plaintext")
+            dev_mode = os.environ.get("KS_DEV_MODE", "false").lower() in ("true", "1", "yes")
+            if dev_mode:
+                logger.warning("KS_ENCRYPTION_KEY not set — provider keys stored as plaintext")
+            else:
+                logger.error(
+                    "KS_ENCRYPTION_KEY not set in production — provider keys will be "
+                    "stored as plaintext. Set this variable or enable KS_DEV_MODE=true. "
+                    "Generate a key with: python -c 'from cryptography.fernet import Fernet; "
+                    "print(Fernet.generate_key().decode())'"
+                )
             _initialized = True
             return None
 
