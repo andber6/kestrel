@@ -15,7 +15,7 @@ def main() -> None:
         description="Kestrel — Drop-in LLM API proxy that routes to the cheapest capable model",
         epilog="Documentation: https://github.com/andber6/kestrel",
     )
-    parser.add_argument("--version", action="version", version="kestrel 0.1.0")
+    parser.add_argument("--version", action="version", version="kestrel 0.2.0")
     sub = parser.add_subparsers(dest="command")
 
     # --- serve ---
