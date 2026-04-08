@@ -43,6 +43,9 @@ def select_model(
 ) -> str:
     """Pick the best model for the tier from available providers.
 
+    Prefers same-provider models first (e.g. claude-sonnet → claude-haiku),
+    then falls back to cross-provider if the original provider is unavailable.
+
     Args:
         tier: The target tier.
         available_providers: Set of provider names that are registered and healthy.
@@ -54,18 +57,28 @@ def select_model(
         The selected model name, or the original model if no routing is possible.
     """
     candidates = TIER_MODELS.get(tier, [])
+    original_provider = _model_to_provider(original_model)
 
-    for model in candidates:
+    def _is_eligible(model: str) -> bool:
         provider = _model_to_provider(model)
         if provider is None:
-            continue
+            return False
         if provider not in available_providers:
-            continue
+            return False
         if allowed_providers and provider not in allowed_providers:
-            continue
-        if denied_providers and provider in denied_providers:
-            continue
-        return model
+            return False
+        return not (denied_providers and provider in denied_providers)
+
+    # First pass: prefer a model from the same provider
+    if original_provider:
+        for model in candidates:
+            if _model_to_provider(model) == original_provider and _is_eligible(model):
+                return model
+
+    # Second pass: fall back to any eligible provider
+    for model in candidates:
+        if _is_eligible(model):
+            return model
 
     # No suitable model found for this tier — keep original
     return original_model

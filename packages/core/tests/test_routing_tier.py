@@ -110,13 +110,41 @@ class TestResolveTier:
 
 
 class TestModelSelector:
-    def test_selects_economy_model(self) -> None:
+    def test_prefers_same_provider_when_routing_down(self) -> None:
+        """claude-sonnet (premium) → claude-haiku (economy), not gpt-4o-mini."""
+        model = select_model(
+            Tier.ECONOMY,
+            {"openai", "anthropic", "groq"},
+            original_model="claude-sonnet-4-6",
+        )
+        assert model == "claude-haiku-4-5"
+
+    def test_prefers_same_provider_openai(self) -> None:
+        """gpt-4o (premium) → gpt-4o-mini (economy), stays on OpenAI."""
         model = select_model(
             Tier.ECONOMY,
             {"openai", "anthropic", "groq"},
             original_model="gpt-4o",
         )
-        assert model in ("gpt-4o-mini", "claude-haiku-4-5", "llama-3.1-8b-instant")
+        assert model == "gpt-4o-mini"
+
+    def test_prefers_same_provider_gemini(self) -> None:
+        """gemini-2.5-pro (premium) → gemini-2.5-flash (economy)."""
+        model = select_model(
+            Tier.ECONOMY,
+            {"openai", "gemini"},
+            original_model="gemini-2.5-pro",
+        )
+        assert model == "gemini-2.5-flash"
+
+    def test_falls_back_cross_provider_when_same_unavailable(self) -> None:
+        """xAI requested but not available → falls back to OpenAI."""
+        model = select_model(
+            Tier.ECONOMY,
+            {"openai", "anthropic"},  # No xAI
+            original_model="grok-3",
+        )
+        assert model in ("gpt-4o-mini", "claude-haiku-4-5")
 
     def test_selects_from_available_providers_only(self) -> None:
         model = select_model(
@@ -151,3 +179,12 @@ class TestModelSelector:
             allowed_providers={"anthropic"},
         )
         assert model == "claude-sonnet-4-6"
+
+    def test_same_provider_preference_with_groq(self) -> None:
+        """llama-3.1-70b (standard/Groq) → llama-3.1-8b (economy/Groq)."""
+        model = select_model(
+            Tier.ECONOMY,
+            {"openai", "groq"},
+            original_model="llama-3.1-70b-versatile",
+        )
+        assert model == "llama-3.1-8b-instant"
