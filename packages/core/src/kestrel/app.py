@@ -15,6 +15,8 @@ from kestrel.config import Settings
 from kestrel.db.session import create_db_engine
 from kestrel.middleware.logging import RequestIdMiddleware, SecurityHeadersMiddleware
 from kestrel.routes.chat import router as chat_router
+from kestrel.services.health_check import HealthCheckService
+from kestrel.services.provider_registry import ProviderRegistry
 from kestrel.services.proxy import ProxyService
 from kestrel.services.request_log import RequestLogService
 
@@ -39,16 +41,41 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     # Services
     log_service = RequestLogService(session_factory)
-    app.state.proxy_service = ProxyService(
+    proxy_service = ProxyService(
         http_client=http_client,
         settings=settings,
         log_service=log_service,
     )
+    app.state.proxy_service = proxy_service
+
+    # Background health checks for provider monitoring.
+    # Uses a standalone registry for tracking health status only
+    # (per-request registries carry user-specific API keys).
+    health_registry = ProviderRegistry.from_settings(
+        settings, http_client, provider_api_keys={}
+    )
+    provider_urls = {
+        "openai": settings.openai_base_url,
+        "anthropic": settings.anthropic_base_url,
+        "gemini": settings.gemini_base_url,
+        "groq": settings.groq_base_url,
+        "mistral": settings.mistral_base_url,
+    }
+    health_check = HealthCheckService(
+        registry=health_registry,
+        http_client=http_client,
+        interval_seconds=settings.health_check_interval,
+        provider_urls=provider_urls,
+    )
+    app.state.health_registry = health_registry
+    health_check.start()
+    app.state.health_check = health_check
 
     logger.info("Kestrel started (dev_mode=%s)", settings.dev_mode)
     yield
 
     # Shutdown
+    await health_check.stop()
     await http_client.aclose()
     await engine.dispose()
     logger.info("Kestrel shut down")
