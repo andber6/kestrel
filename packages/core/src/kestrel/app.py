@@ -51,9 +51,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Background health checks for provider monitoring.
     # Uses a standalone registry for tracking health status only
     # (per-request registries carry user-specific API keys).
-    health_registry = ProviderRegistry.from_settings(
-        settings, http_client, provider_api_keys={}
-    )
+    health_registry = ProviderRegistry.from_settings(settings, http_client, provider_api_keys={})
     provider_urls = {
         "openai": settings.openai_base_url,
         "anthropic": settings.anthropic_base_url,
