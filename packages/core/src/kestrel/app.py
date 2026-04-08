@@ -7,6 +7,7 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 import httpx
+import sqlalchemy
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
@@ -104,9 +105,41 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # Routes
     app.include_router(chat_router)
 
-    # Health check
+    # Health check (liveness)
     @app.get("/health")
     async def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    # Readiness probe — checks DB connectivity and reports provider health
+    @app.get("/ready")
+    async def ready() -> JSONResponse:
+        checks: dict[str, str] = {}
+
+        # Check database (required for readiness)
+        engine = getattr(app.state, "db_engine", None)
+        if engine is not None:
+            try:
+                async with engine.connect() as conn:
+                    await conn.execute(sqlalchemy.text("SELECT 1"))
+                checks["database"] = "ok"
+            except Exception:
+                checks["database"] = "unavailable"
+        else:
+            checks["database"] = "not_configured"
+
+        # Report provider health (informational — providers fail over at request time)
+        health_registry = getattr(app.state, "health_registry", None)
+        if health_registry is not None:
+            available = health_registry.available_providers
+            checks["providers"] = f"{len(available)} available"
+        else:
+            checks["providers"] = "not_configured"
+
+        is_ready = checks.get("database") == "ok"
+        status_code = 200 if is_ready else 503
+        return JSONResponse(
+            status_code=status_code,
+            content={"status": "ready" if is_ready else "not_ready", "checks": checks},
+        )
 
     return app

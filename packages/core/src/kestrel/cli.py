@@ -46,6 +46,22 @@ def main() -> None:
     revoke_parser = key_sub.add_parser("revoke", help="Revoke an API key")
     revoke_parser.add_argument("key_prefix", help="Key prefix to revoke (e.g. ks-xxxxx...)")
 
+    # --- logs ---
+    logs_parser = sub.add_parser("logs", help="Request log management")
+    logs_sub = logs_parser.add_subparsers(dest="logs_command")
+
+    prune_parser = logs_sub.add_parser("prune", help="Delete old request logs")
+    prune_parser.add_argument(
+        "--older-than",
+        required=True,
+        help="Delete logs older than this duration (e.g. 30d, 7d, 24h)",
+    )
+    prune_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show how many rows would be deleted without deleting",
+    )
+
     # --- migrate ---
     sub.add_parser("migrate", help="Run database migrations")
 
@@ -62,6 +78,11 @@ def main() -> None:
             asyncio.run(_cmd_key_revoke(args))
         else:
             key_parser.print_help()
+    elif args.command == "logs":
+        if args.logs_command == "prune":
+            asyncio.run(_cmd_logs_prune(args))
+        else:
+            logs_parser.print_help()
     elif args.command == "migrate":
         _cmd_migrate()
     else:
@@ -192,6 +213,66 @@ async def _cmd_key_revoke(args: argparse.Namespace) -> None:
 
     await engine.dispose()
     print(f"Key revoked: {args.key_prefix} ({key.name})")
+
+
+def _parse_duration(value: str) -> int:
+    """Parse a duration string like '30d', '7d', '24h' into seconds."""
+    value = value.strip().lower()
+    if value.endswith("d"):
+        return int(value[:-1]) * 86400
+    if value.endswith("h"):
+        return int(value[:-1]) * 3600
+    if value.endswith("m"):
+        return int(value[:-1]) * 60
+    raise ValueError(f"Invalid duration: {value}. Use format like 30d, 24h, or 60m.")
+
+
+async def _cmd_logs_prune(args: argparse.Namespace) -> None:
+    from datetime import UTC, datetime, timedelta
+
+    from sqlalchemy import delete, func, select
+
+    from kestrel.config import Settings
+    from kestrel.db.session import create_db_engine
+    from kestrel.models.db import RequestLog
+
+    try:
+        seconds = _parse_duration(args.older_than)
+    except ValueError as e:
+        print(f"Error: {e}")
+        sys.exit(1)
+
+    try:
+        settings = Settings()
+        engine, session_factory = create_db_engine(settings.database_url)
+    except Exception as e:
+        print(f"Error: Could not connect to database: {e}")
+        sys.exit(1)
+
+    cutoff = datetime.now(UTC) - timedelta(seconds=seconds)
+
+    async with session_factory() as session:
+        # Count rows to be deleted
+        count_result = await session.execute(
+            select(func.count()).select_from(RequestLog).where(RequestLog.created_at < cutoff)
+        )
+        count = count_result.scalar() or 0
+
+        if count == 0:
+            print(f"No request logs older than {args.older_than} found.")
+            await engine.dispose()
+            return
+
+        if args.dry_run:
+            print(f"[dry run] Would delete {count:,} request logs older than {args.older_than}.")
+            await engine.dispose()
+            return
+
+        await session.execute(delete(RequestLog).where(RequestLog.created_at < cutoff))
+        await session.commit()
+
+    await engine.dispose()
+    print(f"Deleted {count:,} request logs older than {args.older_than}.")
 
 
 def _cmd_migrate() -> None:

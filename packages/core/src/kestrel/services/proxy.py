@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import random
 import time
 from collections.abc import AsyncGenerator
 from typing import Any
@@ -28,6 +29,10 @@ logger = logging.getLogger(__name__)
 # HTTP status codes that trigger failover
 _RETRYABLE_STATUS_CODES = {429, 500, 502, 503, 504}
 _MAX_RETRIES = 2
+
+# Backoff: base_delay * 2^(attempt-1) + jitter
+_BACKOFF_BASE_SECONDS = 0.5
+_BACKOFF_MAX_JITTER_SECONDS = 0.5
 
 
 class ProxyService:
@@ -128,7 +133,10 @@ class ProxyService:
         attempts = self._build_attempt_list(registry, effective_model)
 
         last_error: Exception | None = None
-        for provider, model_name in attempts:
+        for attempt_idx, (provider, model_name) in enumerate(attempts):
+            if attempt_idx > 0:
+                await _backoff_delay(attempt_idx)
+
             try:
                 # Override model in request for this attempt
                 attempt_request = request.model_copy(update={"model": model_name})
@@ -216,7 +224,10 @@ class ProxyService:
         attempts = self._build_attempt_list(registry, effective_model)
 
         last_error: Exception | None = None
-        for provider, model_name in attempts:
+        for attempt_idx, (provider, model_name) in enumerate(attempts):
+            if attempt_idx > 0:
+                await _backoff_delay(attempt_idx)
+
             try:
                 attempt_request = request.model_copy(update={"model": model_name})
                 first_token_time: float | None = None
@@ -365,6 +376,13 @@ def _log_task_error(task: asyncio.Task[None]) -> None:
 
 def _elapsed_ms(start: float) -> int:
     return int((time.monotonic() - start) * 1000)
+
+
+async def _backoff_delay(attempt: int) -> None:
+    """Sleep with exponential backoff + jitter before a retry attempt."""
+    delay = _BACKOFF_BASE_SECONDS * (2 ** (attempt - 1))
+    jitter = random.uniform(0, _BACKOFF_MAX_JITTER_SECONDS)  # noqa: S311
+    await asyncio.sleep(delay + jitter)
 
 
 def _assemble_chunks(chunks: list[ChatCompletionChunk]) -> dict[str, Any]:

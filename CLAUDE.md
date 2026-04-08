@@ -69,7 +69,30 @@ HTTP → `routes/chat.py` → `services/proxy.py` → `routing/engine.py` (analy
 1. `X-Kestrel-Key: ar-...` + `Authorization: Bearer sk-...` (provider key)
 2. `Authorization: Bearer ar-...` (Kestrel key only, provider key from DB)
 
+**Health endpoints:**
+- `GET /health` — liveness probe, always returns `{"status": "ok"}`
+- `GET /ready` — readiness probe, checks DB connectivity and provider health (returns 503 if not ready)
+
 **Dev mode** (`KS_DEV_MODE=true`): bypasses auth, uses `KS_DEV_*_API_KEY` settings directly.
+
+## Design Decisions
+
+**No proxy-level rate limiting.** Customers bring their own provider API keys, so rate limits are enforced directly between the customer and the upstream provider. Adding a proxy-level rate limiter would be redundant and would break the trust model (the proxy doesn't own the quota). If this changes in the future (e.g., shared key pools), rate limiting should be added at that point.
+
+**No mid-stream failover.** Once streaming has started (first byte sent to client), the proxy commits to that provider. Recovering mid-stream would require buffering the entire response or breaking the SSE contract. This is an intentional limitation — failover only happens before the first byte.
+
+**Rule-based scorer (Phase 1).** The routing scorer uses heuristic rules (keyword matching, character counts, structural analysis) rather than ML. This is intentional for the open-source core — it requires no model files, no GPU, and no training data. The ML classifier (Phase 2) lives in the closed-source `kestrel-server` repo and plugs in via the `Scorer` protocol.
+
+**Fire-and-forget logging.** Request logging is non-blocking (`asyncio.create_task`). If the database is down, requests still succeed — log failures are caught and logged as warnings. This means some logs may be lost during DB outages, which is an acceptable trade-off for never blocking the hot path.
+
+## CLI Commands
+
+Beyond `serve`, `key`, and `migrate`, the CLI includes:
+
+```bash
+kestrel logs prune --older-than 30d          # Delete old request logs
+kestrel logs prune --older-than 7d --dry-run # Preview deletion count
+```
 
 ## What NOT to Put in This Repo
 
