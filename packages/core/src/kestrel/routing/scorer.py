@@ -31,20 +31,21 @@ class RuleBasedScorer:
         """How much multi-step reasoning is needed?"""
         score = 1
 
-        # Longer prompts tend to require more reasoning
-        if f.last_user_message_chars > 500:
+        # Consider overall conversation complexity, not just last message
+        char_signal = max(f.last_user_message_chars, f.total_char_count // 2)
+        if char_signal > 300:
             score += 1
-        if f.last_user_message_chars > 1500:
+        if char_signal > 1000:
             score += 1
 
         # Multi-turn conversations suggest iterative reasoning
-        if f.conversation_depth >= 3:
+        if f.conversation_depth >= 2:
             score += 1
-        if f.conversation_depth >= 8:
+        if f.conversation_depth >= 5:
             score += 1
 
-        # Tool use implies multi-step reasoning
-        if f.has_tools and f.tool_count >= 3:
+        # Any tool use implies structured reasoning
+        if f.has_tools:
             score += 1
 
         # Code blocks suggest technical reasoning
@@ -58,7 +59,7 @@ class RuleBasedScorer:
             score += 1
 
         # Technical keywords compound with analytical
-        if f.technical_keyword_hits >= 3:
+        if f.technical_keyword_hits >= 2:
             score += 1
 
         return _clamp(score)
@@ -71,6 +72,10 @@ class RuleBasedScorer:
         if f.last_user_message_chars > 300:
             score += 1
         if f.last_user_message_chars > 1000:
+            score += 1
+
+        # Long conversations generally expect detailed output
+        if f.total_char_count > 800:
             score += 1
 
         # JSON mode suggests structured output
@@ -123,22 +128,26 @@ class RuleBasedScorer:
         """How precisely must the model follow complex instructions?"""
         score = 1
 
-        # Long system prompts = complex instruction sets
-        if f.system_prompt_chars > 200:
+        # System prompts indicate structured instruction following
+        if f.system_prompt_chars > 100:
             score += 1
-        if f.system_prompt_chars > 800:
+        if f.system_prompt_chars > 500:
             score += 1
         if f.system_prompt_chars > 2000:
             score += 1
 
-        # Many tools = complex decision space
-        if f.tool_count >= 3:
+        # Any tools = decision space, many tools = complex decision space
+        if f.tool_count >= 1:
             score += 1
-        if f.tool_count >= 6:
+        if f.tool_count >= 5:
             score += 1
 
         # JSON mode + tools = precise structured output needed
         if f.has_json_mode and f.has_tools:
+            score += 1
+
+        # Multi-turn conversations need instruction tracking
+        if f.conversation_depth >= 2:
             score += 1
 
         # Multiple questions suggest multi-part instructions
