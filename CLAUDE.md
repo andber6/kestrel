@@ -15,14 +15,14 @@ kestrel/
 │   │   ├── src/kestrel/
 │   │   │   ├── app.py              FastAPI factory, lifespan
 │   │   │   ├── config.py           Settings (KS_ env vars, pydantic-settings)
-│   │   │   ├── providers/          LLM adapters (OpenAI, Anthropic, Gemini, Groq, Mistral, Cohere, Together)
+│   │   │   ├── providers/          LLM adapters (OpenAI, Anthropic, Gemini, Groq, xAI, Mistral, Cohere, Together)
 │   │   │   ├── routing/            Complexity analysis → scoring → tier → model
 │   │   │   ├── services/           Proxy orchestration, registry, health, logging
 │   │   │   ├── auth/               API key auth (two patterns)
 │   │   │   ├── models/             Pydantic (OpenAI format) + SQLAlchemy (DB)
 │   │   │   ├── routes/             POST /v1/chat/completions
 │   │   │   └── middleware/         Request ID + timing
-│   │   └── tests/              167 tests, all mocked (no real API calls)
+│   │   └── tests/              All mocked (no real API calls)
 │   └── sdk-python/             ← Python SDK (thin wrapper over openai package)
 ├── docs/                       ← Markdown documentation
 ├── .github/workflows/ci.yml   ← GitHub Actions (ruff, mypy, pytest)
@@ -39,7 +39,7 @@ make dev          # Start dev server on :8080 with --reload
 make lint         # Ruff check + format check
 make format       # Ruff format + fix
 make typecheck    # Mypy strict mode
-make test         # Pytest with coverage (167 tests)
+make test         # Pytest with coverage
 make sdk-test     # Run SDK tests (10 tests)
 ```
 
@@ -66,8 +66,8 @@ HTTP → `routes/chat.py` → `services/proxy.py` → `routing/engine.py` (analy
 **Routing scorer is pluggable:** The `Scorer` protocol in `routing/models.py` allows the rule-based heuristics to be replaced by an ML classifier without touching other code.
 
 **Auth supports two patterns:**
-1. `X-Kestrel-Key: ar-...` + `Authorization: Bearer sk-...` (provider key)
-2. `Authorization: Bearer ar-...` (Kestrel key only, provider key from DB)
+1. `X-Kestrel-Key: ks-...` + `Authorization: Bearer sk-...` (provider key)
+2. `Authorization: Bearer ks-...` (Kestrel key only, provider key from DB)
 
 **Health endpoints:**
 - `GET /health` — liveness probe, always returns `{"status": "ok"}`

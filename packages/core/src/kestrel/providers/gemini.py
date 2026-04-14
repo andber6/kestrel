@@ -205,7 +205,7 @@ class GeminiProvider(LLMProvider):
                 )
 
         message: dict[str, Any] = {"role": "assistant"}
-        message["content"] = "\n".join(text_parts) if text_parts else ""
+        message["content"] = "\n".join(text_parts) if text_parts else None
         if tool_calls:
             message["tool_calls"] = tool_calls
 
