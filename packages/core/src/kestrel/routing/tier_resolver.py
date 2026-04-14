@@ -39,9 +39,17 @@ _MODEL_TIER_MAP: dict[str, Tier] = {
     "command-r": Tier.STANDARD,
     "command-light": Tier.ECONOMY,
     # xAI
+    "grok-2": Tier.PREMIUM,
+    "grok-2-mini": Tier.STANDARD,
     "grok-3": Tier.PREMIUM,
     "grok-3-mini": Tier.STANDARD,
     "grok-4-0709": Tier.PREMIUM,
+    # Together AI
+    "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo": Tier.ECONOMY,
+    "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo": Tier.STANDARD,
+    "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo": Tier.PREMIUM,
+    # Groq
+    "llama-3.3-70b-versatile": Tier.STANDARD,
 }
 
 _TIER_RANK = {Tier.ECONOMY: 0, Tier.STANDARD: 1, Tier.PREMIUM: 2}

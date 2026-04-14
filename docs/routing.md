@@ -84,9 +84,9 @@ The composite score (5-25) maps to three tiers:
 
 | Score Range | Tier | Example Models |
 |-------------|------|---------------|
-| 5-9 | Economy | gpt-4o-mini, claude-haiku-4-5, gemini-1.5-flash, llama-3.1-8b |
-| 10-16 | Standard | gpt-4o-mini, claude-haiku-4-5, gemini-1.5-flash, llama-3.1-70b |
-| 17-25 | Premium | gpt-4o, claude-sonnet-4-6, gemini-1.5-pro |
+| 0-8 | Economy | gpt-4o-mini, claude-haiku-4-5, gemini-2.5-flash, llama-3.1-8b |
+| 9-14 | Standard | gpt-4o-mini, claude-haiku-4-5, gemini-2.5-flash, llama-3.1-70b |
+| 15-25 | Premium | gpt-4o, claude-sonnet-4-6, gemini-2.5-pro |
 
 ## Model Ceiling
 

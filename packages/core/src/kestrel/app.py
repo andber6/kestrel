@@ -73,6 +73,27 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     health_check.start()
     app.state.health_check = health_check
 
+    # Warn if no provider keys are configured in dev mode
+    if settings.dev_mode:
+        dev_keys = [
+            settings.dev_openai_api_key,
+            settings.dev_anthropic_api_key,
+            settings.dev_gemini_api_key,
+            settings.dev_groq_api_key,
+            settings.dev_xai_api_key,
+            settings.dev_mistral_api_key,
+            settings.dev_cohere_api_key,
+            settings.dev_together_api_key,
+        ]
+        configured = sum(1 for k in dev_keys if k)
+        if configured == 0:
+            logger.warning(
+                "No provider API keys configured. "
+                "Set at least one KS_DEV_*_API_KEY in .env. See .env.example."
+            )
+        else:
+            logger.info("%d provider key(s) configured", configured)
+
     logger.info("Kestrel started (dev_mode=%s)", settings.dev_mode)
     yield
 

@@ -1,5 +1,10 @@
 # Kestrel
 
+[![CI](https://github.com/andber6/kestrel/actions/workflows/ci.yml/badge.svg)](https://github.com/andber6/kestrel/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/kestrel-ai)](https://pypi.org/project/kestrel-ai/)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 **Drop-in LLM API proxy that routes requests to the cheapest capable model.**
 
 Kestrel sits between your AI agent and LLM providers. It intercepts every outgoing API request, classifies the complexity of the prompt, and automatically routes it to the cheapest model that can handle it. You change one line of code — your base URL — and start saving 50-80% on LLM API costs. The response format is identical. Streaming works. Function calling works. Your agent doesn't know routing happened.
@@ -67,6 +72,8 @@ cp .env.example .env
 # Edit .env — add at least one provider API key
 docker compose up
 ```
+
+Visit [http://localhost:8080/docs](http://localhost:8080/docs) for the interactive API explorer.
 
 ### Test it
 
@@ -150,7 +157,7 @@ The composite score (5-25) maps to a tier:
 
 | Score | Tier | Example Models |
 |-------|------|---------------|
-| 5-8 | Economy | gpt-4o-mini, claude-haiku, gemini-flash, llama-3.1-8b |
+| 0-8 | Economy | gpt-4o-mini, claude-haiku, gemini-flash, llama-3.1-8b |
 | 9-14 | Standard | gpt-4o-mini, claude-haiku, gemini-flash, mistral-small |
 | 15-25 | Premium | gpt-4o, claude-sonnet, gemini-pro, grok-3 |
 

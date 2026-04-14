@@ -35,6 +35,10 @@ packages/core/src/kestrel/
     anthropic.py            Anthropic adapter (full format translation)
     gemini.py               Google Gemini adapter (full format translation)
     groq.py                 Groq adapter (OpenAI-compat, strips unsupported fields)
+    xai.py                  xAI Grok adapter (OpenAI-compat)
+    mistral.py              Mistral adapter (OpenAI-compat)
+    cohere.py               Cohere adapter (full format translation)
+    together.py             Together AI adapter (OpenAI-compat)
 
   models/
     openai.py               Pydantic models for OpenAI Chat Completions API
@@ -57,7 +61,7 @@ packages/core/src/kestrel/
 3. ├─ Authentication (dependencies.py → auth/api_key.py)
    │   ├─ Dev mode: bypass, use dev keys
    │   ├─ Pattern 1: X-Kestrel-Key + Authorization (provider key)
-   │   └─ Pattern 2: Authorization: Bearer ar-... (provider key from DB)
+   │   └─ Pattern 2: Authorization: Bearer ks-... (provider key from DB)
    │
 4. ├─ Proxy Service (services/proxy.py)
    │   │

@@ -1,6 +1,6 @@
 # Providers
 
-Kestrel supports 7 LLM providers with automatic format translation. All requests and responses use the OpenAI Chat Completions format.
+Kestrel supports 8 LLM providers with automatic format translation. All requests and responses use the OpenAI Chat Completions format.
 
 ## Supported Providers
 
@@ -30,7 +30,7 @@ Kestrel supports 7 LLM providers with automatic format translation. All requests
 
 - **Format**: Full translation (OpenAI ↔ Gemini generateContent API)
 - **Auth**: API key as query parameter
-- **Models**: gemini-1.5-pro, gemini-1.5-flash, gemini-2.0-pro, gemini-2.0-flash
+- **Models**: gemini-2.5-pro, gemini-2.5-flash, gemini-2.0-pro, gemini-2.0-flash
 - **Translation details**:
   - `messages` → `contents` with `parts` format
   - `assistant` role → `model` role
@@ -70,6 +70,14 @@ Kestrel supports 7 LLM providers with automatic format translation. All requests
   - `finish_reason` mapping: `COMPLETE`/`STOP_SEQUENCE`→`stop`, `TOOL_CALL`→`tool_calls`, `MAX_TOKENS`→`length`, `ERROR`→`stop`
 - **Adapter**: `providers/cohere.py`
 
+### xAI
+
+- **Format**: OpenAI-compatible (minor field stripping)
+- **Auth**: Bearer token
+- **Models**: grok-2, grok-2-mini, grok-3, grok-3-mini, grok-4-0709
+- **Stripped fields**: `logprobs`, `top_logprobs`, `logit_bias`
+- **Adapter**: `providers/xai.py` (extends `OpenAICompatibleProvider`)
+
 ### Together AI
 
 - **Format**: OpenAI-compatible (minor field stripping)
@@ -106,9 +114,9 @@ Failover equivalences:
 
 | Primary | Fallback 1 | Fallback 2 |
 |---------|-----------|-----------|
-| gpt-4o | claude-sonnet-4-6 | gemini-1.5-pro |
-| claude-sonnet-4-6 | gpt-4o | gemini-1.5-pro |
-| gpt-4o-mini | claude-haiku-4-5 | gemini-1.5-flash |
-| llama-3.1-8b-instant | gpt-4o-mini | gemini-1.5-flash |
+| gpt-4o | claude-sonnet-4-6 | gemini-2.5-pro |
+| claude-sonnet-4-6 | gpt-4o | gemini-2.5-pro |
+| gpt-4o-mini | claude-haiku-4-5 | gemini-2.5-flash |
+| llama-3.1-8b-instant | gpt-4o-mini | gemini-2.5-flash |
 
 Maximum 2 retry attempts per request.

@@ -16,6 +16,8 @@ cp .env.example .env
 docker compose up
 ```
 
+Visit [http://localhost:8080/docs](http://localhost:8080/docs) for the interactive API explorer.
+
 Verify it works:
 
 ```bash

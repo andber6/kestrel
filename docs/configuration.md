@@ -20,6 +20,10 @@ In dev mode, set these directly. In production, provider keys are stored per-ope
 | `KS_DEV_ANTHROPIC_API_KEY` | Anthropic API key |
 | `KS_DEV_GEMINI_API_KEY` | Google Gemini API key |
 | `KS_DEV_GROQ_API_KEY` | Groq API key |
+| `KS_DEV_XAI_API_KEY` | xAI API key |
+| `KS_DEV_MISTRAL_API_KEY` | Mistral API key |
+| `KS_DEV_COHERE_API_KEY` | Cohere API key |
+| `KS_DEV_TOGETHER_API_KEY` | Together AI API key |
 
 ## Provider Base URLs
 
@@ -31,6 +35,10 @@ Override these if you're using a proxy or custom endpoint.
 | `KS_ANTHROPIC_BASE_URL` | `https://api.anthropic.com/v1` |
 | `KS_GEMINI_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta` |
 | `KS_GROQ_BASE_URL` | `https://api.groq.com/openai/v1` |
+| `KS_XAI_BASE_URL` | `https://api.x.ai/v1` |
+| `KS_MISTRAL_BASE_URL` | `https://api.mistral.ai/v1` |
+| `KS_COHERE_BASE_URL` | `https://api.cohere.com/v2` |
+| `KS_TOGETHER_BASE_URL` | `https://api.together.xyz/v1` |
 
 ## Routing
 
