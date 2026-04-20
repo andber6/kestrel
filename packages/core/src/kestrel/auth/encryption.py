@@ -96,6 +96,6 @@ def decrypt_value(stored: str) -> str:
         decrypted: str = f.decrypt(stored.encode()).decode()
         return decrypted
     except InvalidToken:
-        # Value is likely legacy plaintext (not encrypted)
-        logger.debug("Could not decrypt value — treating as legacy plaintext")
+        # Value is likely legacy plaintext (stored before encryption was enabled)
+        logger.warning("Could not decrypt value — treating as legacy plaintext")
         return stored

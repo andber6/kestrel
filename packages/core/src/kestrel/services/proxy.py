@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
 import random
 import time
@@ -213,7 +214,11 @@ class ProxyService:
         request: ChatCompletionRequest,
         auth: AuthContext,
     ) -> AsyncGenerator[str, None]:
-        """Proxy a streaming request. Failover only before first byte."""
+        """Proxy a streaming request. Failover only before first byte.
+
+        If an error occurs after streaming has started, an SSE error event
+        is sent to the client so it knows the stream terminated abnormally.
+        """
         registry = self._build_registry(auth)
         start = time.monotonic()
 
@@ -272,6 +277,21 @@ class ProxyService:
             except (httpx.HTTPStatusError, httpx.TimeoutException, httpx.ConnectError) as exc:
                 last_error = exc
                 registry.mark_unhealthy(provider.name)
+                if first_token_time is not None:
+                    # Stream already started — send error event and stop
+                    logger.error(
+                        "Provider %s failed mid-stream for model %s: %s",
+                        provider.name,
+                        model_name,
+                        exc,
+                    )
+                    error_data = json.dumps(
+                        {"error": {"message": "Upstream provider error during streaming",
+                                   "type": "server_error"}}
+                    )
+                    yield f"data: {error_data}\n\n"
+                    yield "data: [DONE]\n\n"
+                    return
                 logger.warning(
                     "Provider %s failed for streaming model %s, trying failover",
                     provider.name,
