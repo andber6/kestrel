@@ -286,8 +286,12 @@ class ProxyService:
                         exc,
                     )
                     error_data = json.dumps(
-                        {"error": {"message": "Upstream provider error during streaming",
-                                   "type": "server_error"}}
+                        {
+                            "error": {
+                                "message": "Upstream provider error during streaming",
+                                "type": "server_error",
+                            }
+                        }
                     )
                     yield f"data: {error_data}\n\n"
                     yield "data: [DONE]\n\n"
