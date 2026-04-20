@@ -7,6 +7,7 @@ import time
 import uuid
 from collections.abc import AsyncGenerator
 from typing import Any
+from urllib.parse import quote
 
 import httpx
 
@@ -48,10 +49,13 @@ class GeminiProvider(LLMProvider):
         return "gemini"
 
     def _generate_url(self, model: str) -> str:
-        return f"{self._base_url}/models/{model}:generateContent?key={self._api_key}"
+        return f"{self._base_url}/models/{quote(model, safe='')}:generateContent"
 
     def _stream_url(self, model: str) -> str:
-        return f"{self._base_url}/models/{model}:streamGenerateContent?key={self._api_key}&alt=sse"
+        return f"{self._base_url}/models/{quote(model, safe='')}:streamGenerateContent?alt=sse"
+
+    def _headers(self) -> dict[str, str]:
+        return {"x-goog-api-key": self._api_key}
 
     def _timeout(self) -> httpx.Timeout:
         return httpx.Timeout(
@@ -239,6 +243,7 @@ class GeminiProvider(LLMProvider):
         response = await self._http_client.post(
             self._generate_url(request.model),
             json=body,
+            headers=self._headers(),
             timeout=self._timeout(),
         )
         response.raise_for_status()
@@ -263,6 +268,7 @@ class GeminiProvider(LLMProvider):
             "POST",
             self._stream_url(request.model),
             json=body,
+            headers=self._headers(),
             timeout=self._timeout(),
         ) as response:
             response.raise_for_status()
