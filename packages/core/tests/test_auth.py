@@ -241,16 +241,45 @@ class TestAuthenticateRequestRevoked:
 
 
 class TestEncryption:
-    def test_encrypt_decrypt_roundtrip(self) -> None:
+    def test_encrypt_decrypt_roundtrip(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Test encryption roundtrip when key is configured."""
+        import kestrel.auth.encryption as enc
+
+        # Reset module state so it re-reads env vars
+        enc._initialized = False
+        enc._fernet = None
+        monkeypatch.setenv("KS_DEV_MODE", "true")
+        monkeypatch.delenv("KS_ENCRYPTION_KEY", raising=False)
+
         from kestrel.auth.encryption import decrypt_value, encrypt_value
 
-        # Without encryption key, values pass through as plaintext
+        # Without encryption key in dev mode, values pass through as plaintext
         assert encrypt_value("secret") == "secret"
         assert decrypt_value("secret") == "secret"
+
+        # Reset for other tests
+        enc._initialized = False
+        enc._fernet = None
 
     def test_empty_string_passthrough(self) -> None:
         from kestrel.auth.encryption import decrypt_value, encrypt_value
 
         assert encrypt_value("") == ""
         assert decrypt_value("") == ""
+
+    def test_production_requires_encryption_key(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Production mode must fail if KS_ENCRYPTION_KEY is not set."""
+        import kestrel.auth.encryption as enc
+
+        enc._initialized = False
+        enc._fernet = None
+        monkeypatch.setenv("KS_DEV_MODE", "false")
+        monkeypatch.delenv("KS_ENCRYPTION_KEY", raising=False)
+
+        with pytest.raises(ValueError, match="KS_ENCRYPTION_KEY must be set"):
+            from kestrel.auth.encryption import encrypt_value
+
+            encrypt_value("secret")
+
+        enc._initialized = False
+        enc._fernet = None
